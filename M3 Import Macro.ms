@@ -1,6 +1,5 @@
 ---------------------------------------------------------------------------
 
-(
 global M3G_ImportInfo_Glb
 
 struct M3S_ImportInfo
@@ -119,6 +118,7 @@ callbacks.addScript #preSystemShutdown "M3G_ImportInfo_Glb.removeToolBar()" id:#
 ---------------------------------------------------------------------------
 
 fn M3F_ImportMain file_FP =()
+fn M3F_TempFunc left right =()
 
 fn M3F_SaveUIsettings =
 (
@@ -587,8 +587,11 @@ rollout Import_UI "Import Settings" width:200 height:408
 
         	with redraw off
         	(
-        		--try(M3F_ImportMain Import_Path.Text)catch(M3F_ImportMain Import_Path.Text)
-        		M3F_ImportMain Import_Path.Text
+        		undo off
+        		(
+					--try(M3F_ImportMain Import_Path.Text)catch(M3F_ImportMain Import_Path.Text)
+					M3F_ImportMain Import_Path.Text
+        		)
         	)
 
 			FillProgressLv 100.0
@@ -1141,7 +1144,12 @@ rollout M3P_ImportPanel "M3 Import" width:214
 
 	fn ImporterDate =
 	(
-		local localImporterDate = getFileModDate ((getdir #startupScripts) + "\\CaptainD-M3Importv1.3.mzp")
+		try
+		(
+			local localImporterDate = getFileModDate ((getdir #startupScripts) + "\\CaptainD-M3Import-v1.4.mzp")
+			local ImporterDate = filterString localImporterDate " "
+			ImporterDate[1]
+		)catch(undefined)
 	)
 
 	fn UpdateUI =
@@ -1267,8 +1275,6 @@ M3G_CustAttributes_Glb = #()
 M3G_InfoScene_Glb=#()
 M3G_InfoFile_Glb=#()
 --Declares------------------------------------------------
-fn M3F_TempFunc left right =()
-
 struct M3SD_RefAnim
 (
 	iptType, flags, animID, initState, nullState,
@@ -2232,6 +2238,7 @@ struct M3SD_RefData
 				"CMS_": append this.data (M3SD_CompMaps.init s:stream_FP)
 				"LFSB": append this.data (M3SD_SubFlares.init s:stream_FP)
 				"SRIB":(this.data = (M3SD_SubRibbon.init s:stream_FP);exit)
+				"SCHR": append this.data (M3SD_RefData.init #() s:stream_FP t:tags_FP)
 				default:()
 			)
 		)
@@ -2502,7 +2509,7 @@ struct M3S_BONE
 (
 	rfdName = M3SD_RefData(), bFlags = M3SD_Flag(), parent,
 	rfaPos = M3SD_RefAnim(), rfaRot = M3SD_RefAnim(), rfaScale = M3SD_RefAnim(),
-	rfaUnknown = M3SD_RefAnim(),
+	rfaVisibility = M3SD_RefAnim(),
 	--Build Items
 	iref,
 
@@ -2527,7 +2534,7 @@ struct M3S_BONE
 		this.rfaPos.read stream_FP #v3d
 		this.rfaRot.read stream_FP #quat
 		this.rfaScale.read stream_FP #v3d
-		this.rfaUnknown.read stream_FP #uint32
+		this.rfaVisibility.read stream_FP #uint32
 	),
 	fn write =()
 )
@@ -3110,6 +3117,7 @@ struct M3S_PAR
 	yawType, pitchType, speedType, vertType, horzType,
 
 	rfdEmissMesh = 	M3SD_RefData(),
+	rfdModel = 		M3SD_RefData(),
 	rfaSquirtAmount=M3SD_RefAnim(), rfaPtVelocity = 	M3SD_RefAnim(),
 	rfaLowBound = 	M3SD_RefAnim(), rfaUpBound = 		M3SD_RefAnim(),
 	rfaEmissRate = 	M3SD_RefAnim(), rfaTrailEmissRate = M3SD_RefAnim(),
@@ -3376,11 +3384,14 @@ struct M3S_PAR
 		this.rfaTrailEmissRate.read stream_FP #float
 		this.splatProjIdx = 		readLong stream_FP #unsigned
 		this.splatChance = 			readFloat stream_FP
+		this.rfdModel.readRef 		stream_FP
+		this.rfdModel.readData 		stream_FP tags_FP
 	),
 	fn write =()
 )
 struct M3S_RIB
 (
+	version,
 	nbrBone, matIdx, ribFlags = M3SD_Flag(), ribFlags1 = M3SD_Flag(),
 	--Emittion
 	emissShape, basedSrc, maxSegs, edges, innerRadius,
@@ -3432,6 +3443,7 @@ struct M3S_RIB
 		if(stream_FP == unsupplied)then(throw "unsupplied")
 		fSeek stream_FP (M3F_FindStart stream_FP tags_FP idx_FP nbr_FP) #seek_set
 		local flag = tags_FP.tags[idx_FP].flag
+		this.version = flag
 
 		this.nbrBone = 			readLong stream_FP #unsigned
 		this.matIdx = 			readLong stream_FP #unsigned
@@ -3446,11 +3458,19 @@ struct M3S_RIB
 
 		if(flag == 0x06)then
 		(
-			this.ribFlags.valSet (readLong stream_FP #unsigned)
+			M3F_SkipBytes stream_FP 4
 		)
 		
-		this.rfaIVyaw.read 		stream_FP #float
-		this.rfaIVpitch.read 	stream_FP #float
+		if(flag == 0x06)then
+		(
+			this.rfaIVpitch.read 	stream_FP #float
+			this.rfaIVyaw.read 		stream_FP #float
+		)else
+		(
+			this.rfaIVyaw.read 		stream_FP #float
+			this.rfaIVpitch.read 	stream_FP #float
+		)
+
 		M3F_SkipBytes stream_FP 40
 		this.rfaLifeTime.read 	stream_FP #float
 
@@ -3490,22 +3510,27 @@ struct M3S_RIB
 		this.pDrag = 			readFloat stream_FP
 		if(flag == 0x06)then
 		(
-			this.pMassR = 			readFloat stream_FP
-			this.pMass = 			readFloat stream_FP
+			this.pMassR = 		readFloat stream_FP
+			this.pMass = 		readFloat stream_FP
 		)else
 		(
-			this.pMass = 			readFloat stream_FP
-			this.pMassR = 			readFloat stream_FP
+			this.pMass = 		readFloat stream_FP
+			this.pMassR = 		readFloat stream_FP
 		)
 
 		this.pMassMult = 		readFloat stream_FP
-		this.pLocalChns = 		readLong stream_FP #unsigned
 
+		if(flag == 0x06)then
+		(
+			M3F_SkipBytes stream_FP 4
+			this.ribFlags.valSet (readLong stream_FP #unsigned)
+		)
+
+		this.pLocalChns = 		readLong stream_FP #unsigned
 		case flag of
 		(
-			0x06: M3F_SkipBytes stream_FP 12
-			0x08: M3F_SkipBytes stream_FP 4
 			0x09: M3F_SkipBytes stream_FP 8
+			default: M3F_SkipBytes stream_FP 4
 		)
 
 		this.noiseAmp = 		readFloat stream_FP
@@ -3544,12 +3569,25 @@ struct M3S_RIB
 
 		this.pLODreduce = 		readLong stream_FP #unsigned
 		this.pLODcut = 			readLong stream_FP #unsigned
-		this.yawType = 			readLong stream_FP #unsigned
-		this.rfaYawAmp.read 	stream_FP #float
-		this.rfaYawFreq.read 	stream_FP #float
-		this.pitchType = 		readLong stream_FP #unsigned
-		this.rfaPitchAmp.read 	stream_FP #float
-		this.rfaPitchFreq.read 	stream_FP #float
+
+		if(flag == 0x06)then
+		(
+			this.pitchType = 		readLong stream_FP #unsigned
+			this.rfaPitchAmp.read 	stream_FP #float
+			this.rfaPitchFreq.read 	stream_FP #float
+			this.yawType = 			readLong stream_FP #unsigned
+			this.rfaYawAmp.read 	stream_FP #float
+			this.rfaYawFreq.read 	stream_FP #float
+		)else
+		(
+			this.yawType = 			readLong stream_FP #unsigned
+			this.rfaYawAmp.read 	stream_FP #float
+			this.rfaYawFreq.read 	stream_FP #float
+			this.pitchType = 		readLong stream_FP #unsigned
+			this.rfaPitchAmp.read 	stream_FP #float
+			this.rfaPitchFreq.read 	stream_FP #float
+		)
+		
 		this.speedType = 		readLong stream_FP #unsigned
 		this.rfaSpeedAmp.read 	stream_FP #float
 		this.rfaSpeedFreq.read 	stream_FP #float
@@ -3795,6 +3833,12 @@ fn M3F_CopyController obj_FP target_FP type:#all=
 	(
 		obj_FP.scale.controller = target_FP.scale.controller
 		obj_FP.scale.controller = bezier_scale()
+	)
+	if(type == #all or type == #visibility)then
+	(
+		obj_FP.visibility = bezier_float()
+		obj_FP.visibility.controller = target_FP.visibility.controller
+		obj_FP.visibility.controller = bezier_float()
 	)
 )
 
@@ -4808,12 +4852,13 @@ struct M3SD_ScPar
 	flipbookMidTimeLock				,
 	IndependentTimings				,
 	AutoCalculateMaxParticleCount	,
+	ModelName 						= #(),--() : string array
+	UseModel 						,--() : boolean
+	SwapYZOnLinkedModels 			,--() : boolean
+	RandomRotationAxisOnLinkedModels,--() : boolean
 	--SpawnRibbonOnBounceChance () : float
 	--ParticleRibbonLink () : string
-	-----ModelName () : string array
-	-----UseModel () : boolean
-	-----SwapYZOnLinkedModels () : boolean
-	-----RandomRotationAxisOnLinkedModels () : boolean
+
 	
 	fn copyData source_FP seq: m3: dir:#fromfile trk: tp: =
 	(
@@ -4854,7 +4899,7 @@ struct M3SD_ScPar
 				[this.ParticleInstanceYaw, this.ParticleInstancePitch]
 			)
 			default:
-			(		
+			(
 				M3F_DataApply dir this source_FP "ColorUseMid" 					""
 				M3F_DataApply dir this source_FP "AlphaUseMid" 					""
 				M3F_DataApply dir this source_FP "SizeUseMid" 					""
@@ -4898,6 +4943,10 @@ struct M3SD_ScPar
 		M3F_DataApply dir this source_FP "MultiplyByMapGravity" 	"parFlags1.bits[18]"
 		M3F_DataApply dir this source_FP "ClampedTailLength" 		"parFlags1.bits[19]"
 		M3F_DataApply dir this source_FP "FixedTailLength" 			"parFlags1.bits[21]"
+
+		M3F_DataApply dir this source_FP "UseModel" 				"parFlags1.bits[23]"
+		M3F_DataApply dir this source_FP "SwapYZOnLinkedModels"		"parFlags1.bits[24]"
+
 		M3F_DataApply dir this source_FP "ScaleTimeByParent" 		"parFlags1.bits[25]"
 		M3F_DataApply dir this source_FP "LocalTime" 				"parFlags1.bits[26]"
 		M3F_DataApply dir this source_FP "SimulateOnInit" 			"parFlags1.bits[27]"
@@ -4910,6 +4959,7 @@ struct M3SD_ScPar
 		M3F_DataApply dir this source_FP "KillSphereEnable" 		"parFlags2.bits[3]"
 		M3F_DataApply dir this source_FP "ParticleVelocityXYOnlyCheck" "parFlags2.bits[4]"
 		M3F_DataApply dir this source_FP "ParticleInheritScaleOnSpawning" "parFlags2.bits[5]"
+		M3F_DataApply dir this source_FP "RandomRotationAxisOnLinkedModels" "parFlags2.bits[8]"
 		
 		M3F_DataApply dir this source_FP "EmitterType" 				"emissShape"
 		M3F_DataApply dir this source_FP "InitialVelocityType" 		"ivType"
@@ -5328,11 +5378,19 @@ struct M3SD_ScRibbon
 				this.alphaMidTimeLock				= false
 				this.sizeMidTimeLock				= false
 				this.rotationMidTimeLock			= false
+
+				if(source_FP.version == 0x06)then
+				(
+					this.WorldSpaceParticles = source_FP.ribFlags.bits[1]
+				)else
+				(
+					this.WorldSpaceParticles = source_FP.ribFlags.bits[4]
+				)
 			)
 			#tofile:
 			()
 			default:
-			(		
+			(
 				M3F_DataApply dir this source_FP "ColorUseMid" 			""
 				M3F_DataApply dir this source_FP "AlphaUseMid" 			""
 				M3F_DataApply dir this source_FP "SizeUseMid" 			""
@@ -5346,10 +5404,10 @@ struct M3SD_ScRibbon
 				M3F_DataApply dir this source_FP "alphaMidTimeLock" 	""
 				M3F_DataApply dir this source_FP "sizeMidTimeLock" 		""
 				M3F_DataApply dir this source_FP "rotationMidTimeLock" 	""
+				M3F_DataApply dir this source_FP "WorldSpaceParticles" 	""
 			)
 		)
 
-		M3F_DataApply dir this source_FP "WorldSpaceParticles" 			"ribFlags.bits[4]"
 		M3F_DataApply dir this source_FP "InheritParentVelocityCheck" 	"ribFlags1.bits[5]"
 		M3F_DataApply dir this source_FP "ScaleTimeByParent" 			"ribFlags1.bits[9]"
 		if(this.subParType == 0)then
@@ -5501,6 +5559,7 @@ struct M3SD_ScRibbon
 		M3F_DataApply dir this source_FP "MassMax" 				"pMassR"
 		M3F_DataApply dir this source_FP "Gravity" 				"pGravity" \
 			c:true f1:"* (-100.0)" f2:"/ (-100.0)"
+
 		M3F_DataApply dir this source_FP "Drag" 				"pDrag"
 		M3F_DataApply dir this source_FP "LODReduction" 		"pLODreduce"
 		M3F_DataApply dir this source_FP "LODCut" 				"pLODcut"
@@ -6323,6 +6382,7 @@ struct M3S_ScBone
 	Position = M3SD_ScAnimData(),
 	Rotation = M3SD_ScAnimData(),
 	Scale = M3SD_ScAnimData(),
+	Visibility = M3SD_ScAnimData(),
 	theBone, theObj, boneType = 0,
 
 	fn init m: s: t: i: =
@@ -6414,11 +6474,13 @@ struct M3S_ScBone
 							--this.theBone.SetSkinPose()
 						)
 					)
-				)			
+				)
 			)else
 			(
 				this.theBone.Transform = this.bindingPose
 			)
+			M3F_AnimApply #toscene this this.theBone \
+			"Visibility" ""
 
 			M3F_AddToLayer "Bones" this.theBone
 		)
@@ -6515,6 +6577,9 @@ struct M3S_ScBone
 		M3F_AnimApply #fromfile this m3_bone \
 		"Scale" "rfaScale" seq:scseq_FP m3:m3obj_FP c:true mult:1.0 \
 		anim:"scale" trk:track_FP tp:track_tp
+		M3F_AnimApply #fromfile this m3_bone \
+		"Visibility" "rfaVisibility" seq:scseq_FP m3:m3obj_FP type:#bool \
+		anim:"visibility" trk:track_FP tp:track_tp
 	),
 
 	fn buildBonesType list_FP type_FP idx_FP =
@@ -7617,6 +7682,21 @@ struct M3S_ScParicle
 					(this.findLink m3obj_FP (m3_particle.colSpawnIdx+1) #par)
 				this.storeData.ParticleSplatLink = \
 					(this.findLink m3obj_FP (m3_particle.splatProjIdx+1) #proj)
+
+				if(m3_particle.parFlags1.bits[23])then
+				(
+					this.storeData.ModelName = #()
+					for i in m3_particle.rfdModel.data do
+					(
+						local find = findString i.data "PrtMdl_"
+						if(find != undefined)then
+						(
+							local mdl_name = substring i.data (find+7) (i.data.count-find-9)
+							append this.storeData.ModelName (copy mdl_name)
+						)
+					)
+					format "    Par:% hasMdl:%\n" idx_FP this.storeData.ModelName
+				)
 			)
 			#rib:
 			(
@@ -8309,6 +8389,4 @@ fn M3F_ImportMain file_FP =
 	-- 	(m3model.fTags.tags[n].ofsData) \
 	-- 	(m3model.fTags.tags[n].nbr) \
 	-- 	(m3model.fTags.tags[n].flag)
-)
-
 )
