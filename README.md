@@ -1,6 +1,7 @@
 # M3_Import
 M3 files Import Tools 使用说明
 --------------------------------------------------------------------------------------
+### [跳转下载](https://github.com/CaptainD001/M3_Import/releases)
 #### 安装：
 * 需要提前安装SC2StarArtTools
 * 复制“CaptainD-M3Import-vXX.mzp”脚本文件到“你Max的安装目录/Scripts/Startup”
