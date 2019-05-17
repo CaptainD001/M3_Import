@@ -17,9 +17,11 @@ M3 files Import Tools 使用说明
 * 复制新版本 “CaptainD-M3Import-vXX.mzp” 脚本文件到同目录
 
 #### 使用：
-* 点击“选择文件”，选择需要导入的文件，然后点击“导入”按钮
-* 导入过程可能花费30到60秒的时间，请耐心等待
-* 如大幅度超过1分钟，可能导入出现错误，请向本人留言(18321277220@163.com)并告知导致导入错误的模型，会尽快修复脚本
+![界面预览](https://github.com/CaptainD001/M3_Import/blob/image/M3Import_0.png)
+* 打开 3dsMax 后，会自动加载脚本，并在上方工具栏，SC2StarArtTools 的右边显示插件按钮
+* 打开导入插件后，点击“选择文件”，选择需要导入的文件，然后点击“导入”按钮，即可导入m3模型
+* 导入过程可能花费 30~60s 的时间，请耐心等待
+* 如大幅度超过 1min，可能导入出现错误，请向本人留言(18321277220@163.com)并告知导致导入错误的模型，我会尽快修复脚本
 #### 主界面：
 ![界面预览](https://github.com/CaptainD001/M3_Import/blob/image/M3Import_1.png)    ![界面预览](https://github.com/CaptainD001/M3_Import/blob/image/M3Import_2.png)    ![界面预览](https://github.com/CaptainD001/M3_Import/blob/image/M3Import_3.png)
 > ### Import Settings
