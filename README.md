@@ -2,6 +2,7 @@
 M3 files Import Tools 使用说明
 --------------------------------------------------------------------------------------
 ### [跳转下载](https://github.com/CaptainD001/M3_Import/releases)
+### 注意：本插件和 SC2StarArtTools 都只支持 3dsMax 2011 x64，其余版本的 3dsMax 无法使用。
 #### 安装：
 * 需要提前安装SC2StarArtTools
 * 复制“CaptainD-M3Import-vXX.mzp”脚本文件到“你Max的安装目录/Scripts/Startup”
@@ -18,7 +19,7 @@ M3 files Import Tools 使用说明
 * 点击“选择文件”，选择需要导入的文件，然后点击“导入”按钮
 * 导入过程可能花费30到60秒的时间，请耐心等待
 * 如大幅度超过1分钟，可能导入出现错误，请向本人留言(18321277220@163.com)并告知导致导入错误的模型，会尽快修复脚本
-#### 界面：
+#### 主界面：
 ![界面预览](https://github.com/CaptainD001/M3_Import/blob/image/M3Import_1.png)    ![界面预览](https://github.com/CaptainD001/M3_Import/blob/image/M3Import_2.png)    ![界面预览](https://github.com/CaptainD001/M3_Import/blob/image/M3Import_3.png)
 > ### Import Settings
 >> ###### 底部选项为相应模块内容导入开关，默认开启
@@ -40,3 +41,7 @@ M3 files Import Tools 使用说明
 >> * ###### 选项暂时无效果
 >> #### 粒子模块：
 >> * ###### 选项暂时无效果
+#### 贴图路径修复工具界面：
+![界面预览](https://github.com/CaptainD001/M3_Import/blob/image/M3Import_4.png)
+> ### 左半部分
+>> ###### 
