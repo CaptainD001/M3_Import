@@ -4,31 +4,33 @@ M3 files Import Tools 使用说明
 **M3 files Import Tools** 是适用于 3dsMax 的一款m3模型文件导入插件，可以导入StarCraft2的相关模型到 3dsMax 中进行编辑修改。
 ## 下载
 * [跳转下载页面](https://github.com/CaptainD001/M3_Import/releases)
-## 注意
-* 本插件和 SC2StarArtTools 都只支持 3dsMax 2011 x64，其余版本的 3dsMax 无法使用。
+## 使用注意
+* 本插件和 SC2StarArtTools 都只支持 **3dsMax 2011 x64**，其余版本的 3dsMax 无法使用。
 * 路径及文件名请全部使用英文，中文会引起运行错误。
-## 安装
-* 需要提前安装SC2StarArtTools
-* 复制“CaptainD-M3Import-vXX.mzp”脚本文件到“你Max的安装目录/Scripts/Startup”
-* 启动3dsmax，工具栏会在最右边自动添加导入面板按钮
+## 安装/卸载/更新
+* #### 安装
+  * 需要提前安装SC2StarArtTools
+  * 复制`CaptainD-M3Import-vXX.mzp`脚本文件到`你Max的安装目录/Scripts/Startup`
+  * 启动3dsMax，工具栏会在最右边自动添加导入插件按钮
+* #### 卸载
+  * 删除 “CaptainD-M3Import-vXX.mzp”重启3dsmax即可
 
-## 卸载
-* 删除 “CaptainD-M3Import-vXX.mzp”重启3dsmax即可
-
-## 更新
-* 删除旧版本 “CaptainD-M3Import-vXX.mzp” 脚本文件
-* 复制新版本 “CaptainD-M3Import-vXX.mzp” 脚本文件到同目录
+* #### 更新
+  * 删除旧版本 “CaptainD-M3Import-vXX.mzp” 脚本文件
+  * 复制新版本 “CaptainD-M3Import-vXX.mzp” 脚本文件到同目录
 
 ## 使用
 ![界面预览](https://github.com/CaptainD001/M3_Import/blob/image/M3Import_0.png)
-* 打开 3dsMax 后，会自动加载脚本，并在上方工具栏，SC2StarArtTools 的右边显示插件按钮
-* 现有功能：[**导入插件主界面**]  [**工具栏折叠/展开**]  [**贴图路径修复工具**]  (从左到右)
-* [**导入插件主界面**]  打开导入插件主界面后，点击“选择文件”，选择需要导入的文件，然后点击“导入”按钮，即可导入m3模型
-> 导入过程可能花费 30~60s 的时间，请耐心等待
->
-> 如大幅度超过 1min，可能导入出现错误，请向本人留言(18321277220@163.com)并告知导致导入错误的模型，我会尽快修复脚本
-* [**工具栏折叠/展开**]  每点击一次会'折叠/展开'后面的工具图标
-* [**贴图路径修复工具**]  可以修复场景材质贴图路径不正确的问题，也可以从游戏文件中自动解压必要贴图，具体使用方法见下方界面预览及其说明
+* 打开 3dsMax 后，会自动加载脚本，并在上方工具栏，`SC2StarArtTools` 的右边显示插件按钮
+* 现有功能：(从左到右)
+  * [**导入插件主界面**]
+    * 打开导入插件主界面后，点击“选择文件”，选择需要导入的文件，然后点击“导入”按钮，即可导入m3模型
+    * 导入过程可能花费 30~60s 的时间，请耐心等待
+    * 如大幅度超过 1min，可能导入出现错误，请向本人留言(18321277220@163.com)并告知导致导入错误的模型，我会尽快修复脚本
+  * [**工具栏折叠/展开**]
+    * 每点击一次会'折叠/展开'后面的工具图标
+  * [**贴图路径修复工具**]
+    * 可以修复场景材质贴图路径不正确的问题，也可以从游戏文件中自动解压必要贴图，具体使用方法见下方界面预览及其说明
 --------------------------------------------------------------------------------------
 #### 主界面：
 ![界面预览](https://github.com/CaptainD001/M3_Import/blob/image/M3Import_1.png)    ![界面预览](https://github.com/CaptainD001/M3_Import/blob/image/M3Import_2.png)    ![界面预览](https://github.com/CaptainD001/M3_Import/blob/image/M3Import_3.png)
