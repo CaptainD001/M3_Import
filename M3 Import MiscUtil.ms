@@ -133,21 +133,9 @@ rollout M3P_TexToolUI "Textures Fix Tool" height:500 width:800
 	(
 		local i
 		local idx_changed = false
-		local game_dir = StarTools.Info.GetDir #localBuild
-		if((doesFileExist (game_dir + "\\StarCraft II.exe")) != true)then
-		(
-			messageBox ("Wrong SC2 game path !!!\n" + \
-						"Please select the game path first!!!\n" + \
-						"Please select the folder containing the StarCraft II exe.")
-			StarTools.Info.SetLocalBuildPath()
-
-			game_dir = StarTools.Info.GetDir #localBuild
-			if((doesFileExist (game_dir + "\\StarCraft II.exe")) != true)then
-			(
-				messageBox "Bad configuration. Operation cancelled."
-				return false
-			)
-		)
+		
+		if(M3F_CheckStarTools #Info func:#gameDir)then
+		(local game_dir = StarTools.Info.GetDir #localBuild)else(return false)
 
 		if((doesFileExist "$plugcfg\\SC2DataIndex\\Temp") != true)then
 		(
@@ -744,6 +732,9 @@ rollout M3P_TexToolUI "Textures Fix Tool" height:500 width:800
 		)
 		searched = 1
 
+		if(M3F_CheckStarTools #Info func:#gameDir)then
+		(local game_dir = StarTools.Info.GetDir #localBuild)else(return false)
+
 		local i
 		local netClass = M3S_DotNetClass()
 		local index_list = #()
@@ -773,7 +764,7 @@ rollout M3P_TexToolUI "Textures Fix Tool" height:500 width:800
 		CreateDialog M3P_TexToolWaitUI style:#(#style_border) lockHeight:true lockWidth:true
 		path_list = findTextures tex_list
 
-		local data_dir = (StarTools.Info.GetDir #localBuild) + "\\SC2Data\\data"
+		local data_dir = game_dir + "\\SC2Data\\data"
 		local idx_dir = pathConfig.resolvePathSymbols "$plugcfg\\SC2DataIndex\\"
 		for i=1 to tex_list.count do
 		(

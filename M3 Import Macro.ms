@@ -33,6 +33,52 @@ fn M3F_AccessINI ini_FP part_FP type_FP =
 	part_FP.value
 )
 
+fn M3F_CheckStarTools type_FP func: =
+(
+	case type_FP of
+	(
+		#Init:
+		(
+			try
+			(
+				local props = getPropNames starTools
+				if(props != #(#Behaviors, #INI, #AssetsTracking, \
+							#helpers, #menu, #AnimProps, #Utilities, \
+							#info, #log, #export, #DisplaySettings))then
+				(
+					undefined = 1
+				)
+			)catch
+			(messageBox "CAN'T FOUND STAR ART TOOLS!!!"; return false)
+		)
+		#Info:(try(starTools.Info)catch(messageBox "CAN'T FOUND STAR ART TOOLS!!!"; return false))
+	)
+	case func of
+	(
+		#gameDir:
+		(
+			local game_dir = StarTools.Info.GetDir #localBuild
+			if(game_dir == undefined)then(game_dir = "")
+			if((doesFileExist (game_dir + "\\StarCraft II.exe")) != true)then
+			(
+				messageBox ("Wrong SC2 game path !!!\n" + \
+							"Please select the game path first!!!\n" + \
+							"Please select the folder containing the StarCraft II exe.")
+				StarTools.Info.SetLocalBuildPath()
+
+				game_dir = StarTools.Info.GetDir #localBuild
+				if(game_dir == undefined)then(game_dir = "")
+				if((doesFileExist (game_dir + "\\StarCraft II.exe")) != true)then
+				(
+					messageBox "Bad configuration. Operation cancelled."
+					return false
+				)
+			)
+		)
+	)
+	true
+)
+
 struct M3S_ImportInfo
 (
 	verison = "v1.6",
@@ -304,6 +350,7 @@ struct M3S_ImportInfo
 
 	on create do
 	(
+		M3F_CheckStarTools #Init
 		this.accessMiscSettings #load
 		local assembly = dotnet.loadAssembly @"$Temp\M3Import_mzp\ExtractFile_M3Lib.dll"
 		this.ExtractFileLib = dotNetObject (assembly.GetExportedTypes())[1].FullName
