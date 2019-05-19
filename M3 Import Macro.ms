@@ -81,7 +81,7 @@ fn M3F_CheckStarTools type_FP func: =
 
 struct M3S_ImportInfo
 (
-	verison = "v1.6",
+	verison = "v1.6a",
 	toolsBtn = 1,
 	ExtractFileLib,
 	--Misc
@@ -1152,9 +1152,8 @@ rollout M3P_ImportPanel "M3 Import" width:214
 	(
 		try
 		(
-			local localImporterDate = getFileModDate \
-				("$startupScripts\\CaptainD-M3Import-"+M3G_ImportInfo_Glb.verison+".mzp")
-			--print (getThisScriptFilename())
+			local mzp_files = getFiles "$startupScripts\\CaptainD-M3Import-v*.mzp"
+			local localImporterDate = getFileModDate mzp_files[1]
 			local ImporterDate = filterString localImporterDate " "
 			ImporterDate[1]
 		)catch(undefined)
