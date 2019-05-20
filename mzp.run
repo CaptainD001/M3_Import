@@ -1,5 +1,0 @@
-name "M3Import"
-description "CaptainD's M3Import." 
-extract to $temp\M3Import_mzp
-run "M3 Import Macro.ms"
-clear temp on MAX exit
