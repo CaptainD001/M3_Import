@@ -8,7 +8,11 @@
 |String							|
 |Byte							|
 |Short							|
+|UShort							|
 |Long							|
+|ULong							|
+|[Flags](#Flags)				|
+|Float							|
 |[TagReference](#TagReference)	|
 |[AnimReference](#AnimReference)|
 |[BndSphere](#BndSphere)		|
@@ -56,14 +60,14 @@
 |-------------------|---------------------------------------|-------|-----------|
 |String				|[String](#String)						|CHAR	|
 |String[]			|[String[]](#String-1)					|SCHR	|
-|UnsignedByte		|[UnsignedByte](#UnsignedByte)			|U8		|
-|UnsignedByte[4]	|[Color](#Color)						|COL	|
-|UnsignedByte[4]	|[DivisionMatch](#DivisionMatch)		|DMSE	|
+|UByte				|[UnsignedByte](#UnsignedByte)			|U8		|
+|UByte[4]			|[Color](#Color)						|COL	|
+|UByte[4]			|[DivisionMatch](#DivisionMatch)		|DMSE	|
 |Short				|[Short](#Short)						|I16	|
-|UnsignedShort		|[UnsignedShort](#UnsignedShort)		|U16	|
-|UnsignedShort[2]	|[UnsignedShort[2]](#UnsignedShort2)	|U32	|
+|UShort				|[UnsignedShort](#UnsignedShort)		|U16	|
+|UShort[2]			|[UnsignedShort[2]](#UnsignedShort2)	|U32	|
 |Long				|[Long](#Long)							|I32	|
-|UnsignedLong		|[UnsignedLong](#UnsignedLong)			|U32	|
+|ULong				|[UnsignedLong](#UnsignedLong)			|U32	|
 |Long[2]			|[Vector2](#Vector2)					|VEC2	|
 |Long[3]			|[Vector3](#Vector3)					|VEC3	|
 |Long[4]			|[Vector4](#Vector4)					|VEC4	|
@@ -101,11 +105,24 @@ ______________________________________________________________________
 
 ## FileHeader
 [返回](#Main-Struct)
-|Offset				|HEX		|Type	|Description	|Bound	|ToMax	|
-|-------------------|-----------|-------|---------------|-------|-------|
-|0x00000000 (0)		|34 33 44 4D|String	|M3文件类型标识	|
+
+|Offset				|HEX								|Type	|Description		|Bound			|ToMax	|
+|-------------------|-----------------------------------|-------|-------------------|---------------|-------|
+|0x00000000 (0)		|34 33 44 4D						|String	|M3文件类型标识		|"MD33","MD34"	|
+|0x00000004 (4)		|10 27 00 00						|Long	|TagStruct入口Offset	|				|
+|0x00000008 (8)		|34 00 00 00						|Long	|TagStruct数量		|				|
+|0x0000000C (12)	|01 00 00 00,01 00 00 00,00 00 00 00|TagRef	|TagRef->ModelInfo	|				|
+
 ## ModelInfo
 [返回](#Main-Struct)
+
+|Offset				|HEX								|Type	|Description		|Bound			|ToMax	|
+|-------------------|-----------------------------------|-------|-------------------|---------------|-------|
+|0x00000000	(0)		|01 00 00 00	02 00 00 00	00 00 00 00|TagRef	|TagRef->MaxFilePath|				|
+|0x0000000C	(12)	|53 18 08 00						|Long	|Vertex类型标识		|				|
+|0x00000010	(16)	|01 00 00 00	03 00 00 00	00 00 00 00|TagRef	|TagStruct数量		|				|
+|0x0000000C	(12)	|01 00 00 00	01 00 00 00	00 00 00 00|TagRef	|TagRef->MODL		|				|
+
 ## Sequence
 [返回](#Main-Struct)
 ## SeqTransCollection
