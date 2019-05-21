@@ -1,7 +1,19 @@
-## M3FileStruct
+## M3 File Struct
 此文件用于说明介绍现已知的M3文件的数据结构，如有不正之处请联系我进行修改。
 
-## MainStruct<br>
+## Supported Data Types<br>
+
+|Type							|Description|
+|-------------------------------|-----------|
+|String							|
+|Byte							|
+|Short							|
+|Long							|
+|[TagReference](#TagReference)	|
+|[AnimReference](#AnimReference)|
+|[BndSphere](#BndSphere)		|
+
+## Main Struct<br>
 
 |Type		|Name										|Entry	|Description|
 |-----------|-------------------------------------------|-------|-----------|
@@ -37,19 +49,19 @@
 |*			|[PhysicsJoint](#PhysicsJoint)				|PHYJ	|
 |Others		|[WarpVertex](#WarpVertex)					|WRP	|
 
-## DataStruct<br>
-* BaseTypes<br>
+## Data Struct<br>
+* Base Struct Types<br>
 
 |Type				|Name									|Entry	|Description|
 |-------------------|---------------------------------------|-------|-----------|
 |String				|[String](#String)						|CHAR	|
-|String[]			|[String[]](#String[])					|SCHR	|
+|String[]			|[String[]](#String-1)					|SCHR	|
 |UnsignedByte		|[UnsignedByte](#UnsignedByte)			|U8		|
 |UnsignedByte[4]	|[Color](#Color)						|COL	|
 |UnsignedByte[4]	|[DivisionMatch](#DivisionMatch)		|DMSE	|
 |Short				|[Short](#Short)						|I16	|
 |UnsignedShort		|[UnsignedShort](#UnsignedShort)		|U16	|
-|UnsignedShort[2]	|[UnsignedShort[2]](#UnsignedShort[2])	|U32	|
+|UnsignedShort[2]	|[UnsignedShort[2]](#UnsignedShort2)	|U32	|
 |Long				|[Long](#Long)							|I32	|
 |UnsignedLong		|[UnsignedLong](#UnsignedLong)			|U32	|
 |Long[2]			|[Vector2](#Vector2)					|VEC2	|
@@ -57,13 +69,12 @@
 |Long[4]			|[Vector4](#Vector4)					|VEC4	|
 |Long[4]			|[Quat](#Quat)							|QUAT	|
 |Float				|[Float](#Float)						|REAL	|
-|Bool[32]			|[Flag](#Flag)							|FLAG	|
+|UnsignedLong		|[Flag](#Flag)							|FLAG	|
 
-* ExternTypes<br>
+* Extend Struct Types<br>
 
 |Name												|Entry		|Description|
 |---------------------------------------------------|-----------|-----------|
-|[BndSphere](#BndSphere)							|			|
 |[Tag](#Tag)										|			|
 |[Spline](#Spline)									|SVC3		|
 |[HitTest](#HitTest)								|SSGS/ATVL	|
@@ -79,131 +90,143 @@
 |[PhysicsRigedBodyShape](#PhysicsRigedBodyShape)	|PHSH		|
 ______________________________________________________________________
 
+## TagReference
+[返回](#Supported-Data-Types)
+## AnimReference
+[返回](#Supported-Data-Types)
+## BndSphere
+[返回](#Supported-Data-Types)
+
+______________________________________________________________________
+
 ## FileHeader
-[返回](#MainStruct)
+[返回](#Main-Struct)
+|Offset				|HEX		|Type	|Description	|Bound	|ToMax	|
+|-------------------|-----------|-------|---------------|-------|-------|
+|0x00000000 (0)		|34 33 44 4D|String	|M3文件类型标识	|
 ## ModelInfo
-[返回](#MainStruct)
+[返回](#Main-Struct)
 ## Sequence
-[返回](#MainStruct)
+[返回](#Main-Struct)
 ## SeqTransCollection
-[返回](#MainStruct)
+[返回](#Main-Struct)
 ## SeqTransGroup
-[返回](#MainStruct)
+[返回](#Main-Struct)
 ## SeqTransSet
-[返回](#MainStruct)
+[返回](#Main-Struct)
 ## TrackSet
-[返回](#MainStruct)
+[返回](#Main-Struct)
 ## Bone
-[返回](#MainStruct)
+[返回](#Main-Struct)
 ## Vertex
-[返回](#MainStruct)
+[返回](#Main-Struct)
 ## Division
-[返回](#MainStruct)
+[返回](#Main-Struct)
 ## BindingPose
-[返回](#MainStruct)
+[返回](#Main-Struct)
 ## Attachment
-[返回](#MainStruct)
+[返回](#Main-Struct)
 ## Light
-[返回](#MainStruct)
+[返回](#Main-Struct)
 ## Camera
-[返回](#MainStruct)
+[返回](#Main-Struct)
 ## MaterialMatch
-[返回](#MainStruct)
+[返回](#Main-Struct)
 ## Standard
-[返回](#MainStruct)
+[返回](#Main-Struct)
 ## Displacement
-[返回](#MainStruct)
+[返回](#Main-Struct)
 ## Composite
-[返回](#MainStruct)
+[返回](#Main-Struct)
 ## Terrain
-[返回](#MainStruct)
+[返回](#Main-Struct)
 ## Creep
-[返回](#MainStruct)
+[返回](#Main-Struct)
 ## Volume
-[返回](#MainStruct)
+[返回](#Main-Struct)
 ## VolumeNoise
-[返回](#MainStruct)
+[返回](#Main-Struct)
 ## SplatTerrainBake
-[返回](#MainStruct)
+[返回](#Main-Struct)
 ## Flare
-[返回](#MainStruct)
+[返回](#Main-Struct)
 ## Particle
-[返回](#MainStruct)
+[返回](#Main-Struct)
 ## Ribbon
-[返回](#MainStruct)
+[返回](#Main-Struct)
 ## Projecter
-[返回](#MainStruct)
+[返回](#Main-Struct)
 ## Force
-[返回](#MainStruct)
+[返回](#Main-Struct)
 ## PhysicsRigedBody
-[返回](#MainStruct)
+[返回](#Main-Struct)
 ## PhysicsJoint
-[返回](#MainStruct)
+[返回](#Main-Struct)
 ## WarpVertex
-[返回](#MainStruct)
+[返回](#Main-Struct)
 
 ______________________________________________________________________
 
 ## String
-[返回](#DataStruct)
+[返回](#Data-Struct)
 ## String[]
-[返回](#DataStruct)
+[返回](#Data-Struct)
 ## UnsignedByte
-[返回](#DataStruct)
+[返回](#Data-Struct)
 ## Color
-[返回](#DataStruct)
+[返回](#Data-Struct)
 ## DivisionMatch
-[返回](#DataStruct)
+[返回](#Data-Struct)
 ## Short
-[返回](#DataStruct)
+[返回](#Data-Struct)
 ## UnsignedShort
-[返回](#DataStruct)
+[返回](#Data-Struct)
 ## UnsignedShort[2]
-[返回](#DataStruct)
+[返回](#Data-Struct)
 ## Long
-[返回](#DataStruct)
+[返回](#Data-Struct)
 ## UnsignedLong
-[返回](#DataStruct)
+[返回](#Data-Struct)
 ## Vector2
-[返回](#DataStruct)
+[返回](#Data-Struct)
 ## Vector3
-[返回](#DataStruct)
+[返回](#Data-Struct)
 ## Vector4
-[返回](#DataStruct)
+[返回](#Data-Struct)
 ## Quat	
-[返回](#DataStruct)
+[返回](#Data-Struct)
 ## Float
-[返回](#DataStruct)
+[返回](#Data-Struct)
 ## Flag
-[返回](#DataStruct)
+[返回](#Data-Struct)
 
 ______________________________________________________________________
 
 ## BndSphere
-[返回](#DataStruct)
+[返回](#Data-Struct)
 ## Tag
-[返回](#DataStruct)
+[返回](#Data-Struct)
 ## Spline
-[返回](#DataStruct)
+[返回](#Data-Struct)
 ## HitTest
-[返回](#DataStruct)
+[返回](#Data-Struct)
 ## Event
-[返回](#DataStruct)
+[返回](#Data-Struct)
 ## AnimBlock
-[返回](#DataStruct)
+[返回](#Data-Struct)
 ## Region
-[返回](#DataStruct)
+[返回](#Data-Struct)
 ## Boundary
-[返回](#DataStruct)
+[返回](#Data-Struct)
 ## MeshMaterialInfo
-[返回](#DataStruct)
+[返回](#Data-Struct)
 ## MapLayer
-[返回](#DataStruct)
+[返回](#Data-Struct)
 ## CompositeMatSet
-[返回](#DataStruct)
+[返回](#Data-Struct)
 ## FlareSubObj
-[返回](#DataStruct)
+[返回](#Data-Struct)
 ## RibbonSubObj
-[返回](#DataStruct)
+[返回](#Data-Struct)
 ## PhysicsRigedBodyShape
-[返回](#DataStruct)
+[返回](#Data-Struct)
