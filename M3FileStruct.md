@@ -13,9 +13,7 @@
 |Mesh      |[Bone]()              |BONE |
 |*         |[Vertex]()            |U8   |
 |*         |[Division]()          |DIV  |
-|*         |[MeshMaterialInfo]()  |BAT  |
 |*         |[BindingPose]()       |IREF |
-|*         |[Boundary]()          |MSEC |
 |Attachment|[Attachment]()        |ATT  |
 |Light     |[Light]()             |LITE |
 |Camera    |[Camera]()            |CAM  |
@@ -37,12 +35,39 @@
 |*         |[PhysicsJoint]()      |PHYJ |
 |Others    |[WarpVertex]()        |WRP  |
 ## DataStruct<br>
-|BaseType  |Name                  |Description|
-|----------|----------------------|-----------|
-|          |[BndSphere]()         |
-|          |[Tag]()               |
-|          |[Vert]()              |
-|          |[HitTest]()           |
-|EVNT      |[Event]()             |
-|          |[AnimBlock]()         |
-|REGN      |[Region]()            |
+* BaseTypes
+|Type            |Name                  |Entry|Description|
+|----------------|----------------------|-----|-----------|
+|String          |[String]()            |CHAR |
+|String[]        |[String[]]()          |SCHR |
+|UnsignedByte    |[UnsignedByte]()      |U8   |
+|UnsignedByte[4] |[Color]()             |COL  |
+|UnsignedByte[4] |[DivisionMatch]()     |DMSE |
+|Short           |[Short]()             |I16  |
+|UnsignedShort   |[UnsignedShort]()     |U16  |
+|UnsignedShort[2]|[UnsignedShort[2]]()  |U32  |
+|Long            |[Long]()              |I32  |
+|UnsignedLong    |[UnsignedLong]()      |U32  |
+|Long[2]         |[Vector2]()           |VEC2 |
+|Long[3]         |[Vector3]()           |VEC3 |
+|Long[4]         |[Vector4]()           |VEC4 |
+|Long[4]         |[Quat]()              |QUAT |
+|Float           |[Float]()             |REAL |
+|Bool[32]        |[Flag]()              |FLAG |
+* ExternTypes
+|Name                     |Entry    |Description|
+|-------------------------|---------|-----------|
+|[BndSphere]()            |         |
+|[Tag]()                  |         |
+|[Spline]()               |SVC3     |
+|[HitTest]()              |SSGS/ATVL|
+|[Event]()                |EVNT     |
+|[AnimBlock]()            |SD**     |
+|[Region]()               |REGN     |
+|[Boundary]()             |MSEC     |
+|[MeshMaterialInfo]()     |BAT      |
+|[MapLayer]()             |LAYR     |
+|[CompositeMatSet]()      |CMS      |
+|[FlareSubObj]()          |LFSB     |
+|[RibbonSubObj]()         |SRIB     |
+|[PhysicsRigedBodyShape]()|PHSH     |
