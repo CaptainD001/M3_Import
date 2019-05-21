@@ -35,7 +35,7 @@
 |*         |[PhysicsJoint]()      |PHYJ |
 |Others    |[WarpVertex]()        |WRP  |
 ## DataStruct<br>
-* BaseTypes
+* BaseTypes<br>
 |Type            |Name                  |Entry|Description|
 |----------------|----------------------|-----|-----------|
 |String          |[String]()            |CHAR |
@@ -54,7 +54,7 @@
 |Long[4]         |[Quat]()              |QUAT |
 |Float           |[Float]()             |REAL |
 |Bool[32]        |[Flag]()              |FLAG |
-* ExternTypes
+* ExternTypes<br>
 |Name                     |Entry    |Description|
 |-------------------------|---------|-----------|
 |[BndSphere]()            |         |
