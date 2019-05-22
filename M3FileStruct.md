@@ -1,3 +1,5 @@
+<font color=red>我是红色</font>
+
 ## M3 File Struct
 此文件用于说明介绍现已知的M3文件的数据结构，如有不正之处请联系我进行修改。
 
@@ -108,14 +110,76 @@ ______________________________________________________________________
 
 <details>
   <summary><mark><font color=darkred>点击查看详细内容</font></mark></summary>
-<table bgcolor="Hotpink">
-<tr><td colspan="2">Offset</td><td colspan="4">HEX</td><td>Type</td><td>Name</td><td>Description</td><td>Bound</td><td>ToMax</td></tr>
+<table>
+<tr><td colspan="2" bgcolor="Yellow"><font color=#00ffff>Offset</font></td><td colspan="4">HEX</td><td>Type</td><td>Name</td><td>Description</td><td>Bound</td><td>ToMax</td></tr>
 <tr><td>0x00000000</td><td>(0)</td><td>3433444D</td><td></td><td></td><td></td><td>String</td><td>FileID</td><td>M3文件类型标识</td><td>"MD33","MD34"</td><td></td></tr>
 <tr><td>0x00000004</td><td>(4)</td><td>10270000</td><td></td><td></td><td></td><td>Long</td><td>TagAddr</td><td>TagStruct入口地址</td><td></td><td></td></tr>
 <tr><td>0x00000008</td><td>(8)</td><td>34000000</td><td></td><td></td><td></td><td>Long</td><td>TagCount</td><td>TagStruct数量</td><td>[0,...]</td><td></td></tr>
 <tr><td>0x0000000C</td><td>(12)</td><td>01000000</td><td>01000000</td><td>00000000</td><td></td><td>TagRef</td><td></td><td>TagRef->ModelInfo(Struct:MODL)</td><td></td><td></td></tr>
 </table>
 </details>
+
+{| class="wikitable"
+! Offset
+! 
+! HEX
+! 
+! 
+! 
+! Type
+! Name
+! Description
+! Bound
+! ToMax
+|-
+| 0x00000000
+| (0)
+| 3433444D
+| 
+| 
+| 
+| String
+| FileID
+| M3文件类型标识
+| MD33,"MD34"
+| 
+|-
+| 0x00000004
+| (4)
+| 10270000
+| 
+| 
+| 
+| Long
+| TagAddr
+| TagStruct入口地址
+| 
+| 
+|-
+| 0x00000008
+| (8)
+| 34000000
+| 
+| 
+| 
+| Long
+| TagCount
+| TagStruct数量
+| [0,...]
+| 
+|-
+| 0x0000000C
+| (12)
+| 01000000
+| 01000000
+| 00000000
+| 
+| TagRef
+| 
+| TagRef->ModelInfo(Struct:MODL)
+| 
+| 
+|}
 
 ## ModelInfo
 [返回](#Main-Struct)
