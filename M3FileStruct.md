@@ -108,11 +108,15 @@ ______________________________________________________________________
 
 <table>
 <tr><td colspan="2">Offset</td><td colspan="4">HEX</td><td>Type</td><td>Name</td><td>Description</td><td>Bound</td><td>ToMax</td></tr>																					
+<details>
+  <summary><mark><font color=darkred>点击查看详细内容</font></mark></summary>
 <tr><td>0x00000000</td><td>(0)</td><td>3433444D</td><td></td><td></td><td></td><td>String</td><td>FileID</td><td>M3文件类型标识</td><td>"MD33","MD34"</td><td></td></tr>																					
+</details>
 <tr><td>0x00000004</td><td>(4)</td><td>10270000</td><td></td><td></td><td></td><td>Long</td><td>TagAddr</td><td>TagStruct入口地址</td><td></td><td></td></tr>																					
 <tr><td>0x00000008</td><td>(8)</td><td>34000000</td><td></td><td></td><td></td><td>Long</td><td>TagCount</td><td>TagStruct数量</td><td>[0,...]</td><td></td></tr>																					
 <tr><td>0x0000000C</td><td>(12)</td><td>01000000</td><td>01000000</td><td>00000000</td><td></td><td>TagRef</td><td></td><td>TagRef->ModelInfo(Struct:MODL)</td><td></td><td></td></tr>																					
 </table>
+
 
 ## ModelInfo
 [返回](#Main-Struct)
