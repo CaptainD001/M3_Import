@@ -64,6 +64,8 @@ fn M3F_FillProgressLv step:1.0 flag:#null =
 			M3G_ImportInfo_Glb.progressLv += step
 		)
 	)
+	windows.processPostedMessages()
+	setWaitCursor()
 )
 
 fn M3F_ShowPhase str_FP =
@@ -230,13 +232,14 @@ fn M3F_GetSize name_FP f:0 =
 
 	ret = case name_FP of
 	(
-		"MODL": case f of(0x17: 784;	0x1A: 832;	0x1D: 864)
+		"MODL": case f of(0x17: 784;	0x1A: 820;	0x1D: 856)
 		"SEQS": case f of(0x01: 96;		0x02: 92)
 		"STC_": case f of(0x04: 204)
 		"STG_": case f of(0x00: 24)
 		"STS_": case f of(0x00: 28)
 		"BONE": case f of(0x01: 160)
 		"REGN": case f of(0x03: 36;		0x04: 40;	0x05: 48)
+		"BAT_": case f of(0x01: 14)
 		"DIV_": case f of(0x02: 52)
 		"IREF": case f of(0x00: 64)
 		"ATT_": case f of(0x01: 20)
@@ -253,7 +256,7 @@ fn M3F_GetSize name_FP f:0 =
 		"VON_": case f of(0x00: 268)
 		"STBM": case f of(0x00: 48)
 		"LFLR": case f of(0x02: 80;		0x03: 152)
-		"PAR_": case f of(0x0C: 1316;	0x12: 1464;	0x15: 1464;	0x16: 1484; 0x17: 1492;	0x18: 1496)
+		"PAR_": case f of(0x0C: 1316;	0x12: 1464;	0x13: 1464;	0x15: 1464;	0x16: 1484; 0x17: 1492;	0x18: 1496)
 		"RIB_": case f of(0x06: 748; 	0x08: 756;	0x09: 760)
 		"PROJ": case f of(0x04: 388;	0x05: 388)
 		"FOR_": case f of(0x01: 104;	0x02: 104)
@@ -618,9 +621,9 @@ struct M3SD_Region
 
 struct M3SD_MeshMat
 (
-	meshID, matID,
+	meshID, matID, nbrBone,
 
-	fn init d1:0 d2:0 s: =
+	fn init d1:0 d2:0 d3:0 s: =
 	(
 		local meshmat
 		try(meshmat = this)catch(meshmat = M3SD_MeshMat())
@@ -628,6 +631,7 @@ struct M3SD_MeshMat
 		(
 			meshmat.meshID = d1
 			meshmat.matID = d2
+			meshmat.nbrBone = d3
 		)
 		return meshmat
 	),
@@ -639,7 +643,7 @@ struct M3SD_MeshMat
 		this.meshID = readShort stream_FP #unsigned
 		M3F_SkipBytes stream_FP 4
 		this.matID = readShort stream_FP #unsigned
-		M3F_SkipBytes stream_FP 2
+		this.nbrBone = readShort stream_FP #unsigned
 	)
 )
 
@@ -656,6 +660,7 @@ struct M3SD_MapLayer
 	rfaWoffset = M3SD_RefAnim(), rfaWtill = M3SD_RefAnim(), rfaMapAlpha = M3SD_RefAnim(),
 	rfaTriOffset = M3SD_RefAnim(), rfaTriScale = M3SD_RefAnim(),
 	fresnelMode, fresnelExponent, fresnelMin, fresnelMax, fresnelMask, fresnelRot,
+	version,
 
 	fn init d1:(M3SD_RefData.init "") s: t: i: =
 	(
@@ -706,6 +711,7 @@ struct M3SD_MapLayer
 	(
 		if(stream_FP == unsupplied)then(throw "unsupplied")
 		local flag = tags_FP.tags[idx_FP].flag
+		this.version = flag
 
 		M3F_SkipBytes stream_FP 4
 		this.rfdName.readRef stream_FP
@@ -749,21 +755,22 @@ struct M3SD_MapLayer
 		(
 			this.rfaTriOffset.init t:#v3d
 			this.rfaTriScale.init t:#v3d
-			this.fresnelMode = 0
-			this.fresnelExponent = 0
-			this.fresnelMin = 0
-			this.fresnelMax = 0
-			this.fresnelMask = M3F_CreateRawData t:#v3d
-			this.fresnelRot = M3F_CreateRawData t:#v2d
 		)else
 		(
 			this.rfaTriOffset.read stream_FP #v3d
 			this.rfaTriScale.read stream_FP #v3d
-			M3F_SkipBytes stream_FP 4
-			this.fresnelMode = readLong stream_FP #unsigned
-			this.fresnelExponent = readFloat stream_FP
-			this.fresnelMin = readFloat stream_FP
-			this.fresnelMax = readFloat stream_FP
+		)
+		M3F_SkipBytes stream_FP 4
+		this.fresnelMode = readLong stream_FP #unsigned
+		this.fresnelExponent = readFloat stream_FP
+		this.fresnelMin = readFloat stream_FP
+		this.fresnelMax = readFloat stream_FP
+		if(flag == 0x16)then
+		(
+			this.fresnelMask = M3F_CreateRawData d1:1.0 d2:1.0 d3:1.0 t:#v3d
+			this.fresnelRot = M3F_CreateRawData t:#v2d
+		)else
+		(
 			M3F_SkipBytes stream_FP 12
 			this.fresnelMask = M3F_ReadRawData stream_FP #v3d
 			this.fresnelRot = M3F_ReadRawData stream_FP #v2d
@@ -837,6 +844,7 @@ struct M3SD_SubRibbon
 (
 	ribSpeed, subRibSpeed, nbrBone, yawType, pitchType, speedType,
 
+	rfaSpeedMult =	M3SD_RefAnim(), rfaSubSpeedMult = M3SD_RefAnim(),
 	rfaYaw = 		M3SD_RefAnim(), rfaPitch = 		M3SD_RefAnim(),
 	rfaYawAmp = 	M3SD_RefAnim(), rfaYawFreq = 	M3SD_RefAnim(),
 	rfaPitchAmp = 	M3SD_RefAnim(), rfaPitchFreq = 	M3SD_RefAnim(),
@@ -870,24 +878,25 @@ struct M3SD_SubRibbon
 	fn read stream_FP =
 	(
 		if(stream_FP == unsupplied)then(throw "unsupplied")
-		M3F_SkipBytes stream_FP 20
-		this.ribSpeed = readFloat stream_FP
-		M3F_SkipBytes stream_FP 8
-		this.subRibSpeed = readFloat stream_FP
-		M3F_SkipBytes stream_FP 12
-		this.nbrBone = readLong stream_FP #unsigned
-		M3F_SkipBytes stream_FP 40
-		this.yawType = 			readLong stream_FP #unsigned
-		this.rfaYawAmp.read 	stream_FP #float
-		this.rfaYawFreq.read 	stream_FP #float
-		this.pitchType = 		readLong stream_FP #unsigned
-		this.rfaPitchAmp.read 	stream_FP #float
-		this.rfaPitchFreq.read 	stream_FP #float
-		this.speedType = 		readLong stream_FP #unsigned
-		this.rfaSpeedAmp.read 	stream_FP #float
-		this.rfaSpeedFreq.read 	stream_FP #float
-		this.rfaYaw.read 		stream_FP #float
-		this.rfaPitch.read 		stream_FP #float
+		M3F_SkipBytes stream_FP 	20
+		this.ribSpeed = 			readFloat stream_FP
+		M3F_SkipBytes stream_FP 	8
+		this.subRibSpeed = 			readFloat stream_FP
+		M3F_SkipBytes stream_FP 	12
+		this.nbrBone = readLong 	stream_FP #unsigned
+		this.rfaSpeedMult.read 		stream_FP #float
+		this.rfaSubSpeedMult.read 	stream_FP #float
+		this.yawType = 				readLong stream_FP #unsigned
+		this.rfaYawAmp.read 		stream_FP #float
+		this.rfaYawFreq.read 		stream_FP #float
+		this.pitchType = 			readLong stream_FP #unsigned
+		this.rfaPitchAmp.read 		stream_FP #float
+		this.rfaPitchFreq.read 		stream_FP #float
+		this.speedType = 			readLong stream_FP #unsigned
+		this.rfaSpeedAmp.read 		stream_FP #float
+		this.rfaSpeedFreq.read 		stream_FP #float
+		this.rfaYaw.read 			stream_FP #float
+		this.rfaPitch.read 			stream_FP #float
 	)
 )
 
@@ -1253,7 +1262,7 @@ struct M3S_SEQS
 struct M3S_STC
 (
 	rfdName = M3SD_RefData(), runsConcurrent, animPriority,
-	idxSTS, idxSTG, rfdAnimID = M3SD_RefData(), rfdAnimRef = M3SD_RefData(),
+	idxSTS, rfdAnimID = M3SD_RefData(), rfdAnimRef = M3SD_RefData(),
 	rfdAnimDatas,
 
 	fn init s: t: i: n: =
@@ -1274,7 +1283,8 @@ struct M3S_STC
 		this.runsConcurrent = readShort stream_FP #unsigned
 		this.animPriority = readShort stream_FP #unsigned
 		this.idxSTS = readShort stream_FP #unsigned
-		this.idxSTG = readShort stream_FP #unsigned
+		M3F_SkipBytes stream_FP 2
+		--this.idxSTG = readShort stream_FP #unsigned
 		this.rfdAnimID.readRef stream_FP
 		this.rfdAnimID.readData stream_FP tags_FP
 		this.rfdAnimRef.readRef stream_FP
@@ -1386,24 +1396,26 @@ struct M3S_VERT
 	fn read stream_FP tags_FP idx_FP =
 	(
 		if(stream_FP == unsupplied)then(throw "unsupplied")
-		local i,m,size,nbr
+		local i, m, size, nbr
+		local has_color = false
 
 		if((this.vFlags.valGet()) == 0)then
 		(
 			fSeek stream_FP 128 #seek_set
 			this.vFlags.valSet (readLong stream_FP #unsigned)
 		)
+		print ("vertFlag: " + formattedprint (this.vFlags.valGet()) format:"0#8x")
 
 		fSeek stream_FP (M3F_FindStart stream_FP tags_FP idx_FP 1) #seek_set
 
 		this.nbrUVs = 0
-		if(this.vFlags.bitGet 10)then(this.nbrUVs += 1)
-		if(this.vFlags.bitGet 18)then(this.nbrUVs += 1)
-		if(this.vFlags.bitGet 19)then(this.nbrUVs += 1)
-		if(this.vFlags.bitGet 20)then(this.nbrUVs += 1)
-		if(this.vFlags.bitGet 21)then(this.nbrUVs += 1)
-		if(this.vFlags.bitGet 30)then(this.nbrUVs += 1)
-		size = 28 + this.nbrUVs*4
+		if(this.vFlags.bitGet 10)then(has_color = true)
+		if(this.vFlags.bitGet 18)then(this.nbrUVs+= 1)
+		if(this.vFlags.bitGet 19)then(this.nbrUVs+= 1)
+		if(this.vFlags.bitGet 20)then(this.nbrUVs+= 1)
+		if(this.vFlags.bitGet 21)then(this.nbrUVs+= 1)
+		if(this.vFlags.bitGet 30)then(this.nbrUVs+= 1)
+		size = if(has_color)then(32 + (this.nbrUVs * 4))else(28 + (this.nbrUVs * 4))
 		nbr = tags_FP.tags[idx_FP].nbr / size
 
 		this.vertexs = #()
@@ -1417,11 +1429,12 @@ struct M3S_VERT
 			vert.normal = [ReadByte stream_FP #signed, ReadByte stream_FP #signed, ReadByte stream_FP #signed]
 			M3F_SkipBytes stream_FP 1
 
+			if(has_color)then(vert.vColor = M3F_ReadRawData stream_FP #bgra)
 			for m=1 to this.nbrUVs do
 			(
 				append vert.uv [ReadShort stream_FP, ReadShort stream_FP]
 			)
-			vert.vColor = M3F_ReadRawData stream_FP #bgra
+			M3F_SkipBytes stream_FP 4
 
 			append this.vertexs vert
 		)
@@ -1892,7 +1905,7 @@ struct M3S_LFLR
 (
 	rfdName = M3SD_RefData(), rfdFlareMap = M3SD_RefData(),
 	rfdStrengthMap = M3SD_RefData(), rfdSubFlares = M3SD_RefData(),
-	Columns, Rows, flareMuti, rfdEnd = M3SD_RefData(),
+	Columns, Rows, flareMult, rfdEnd = M3SD_RefData(),
 	rfaParam1 = M3SD_RefAnim(), rfaParam2 = M3SD_RefAnim(),
 	rfaParam3 = M3SD_RefAnim(), rfaParam4 = M3SD_RefAnim(),
 
@@ -1918,7 +1931,7 @@ struct M3S_LFLR
 		this.rfdSubFlares.readData stream_FP tags_FP
 		this.Columns = readLong stream_FP #unsigned
 		this.Rows = readLong stream_FP #unsigned
-		this.flareMuti = readFloat stream_FP
+		this.flareMult = readFloat stream_FP
 
 		case tags_FP.tags[idx_FP].flag of
 		(
@@ -2030,8 +2043,8 @@ struct M3S_PAR
 		)
 		this.rfaIVyaw.read 			stream_FP #float
 		this.rfaIVpitch.read 		stream_FP #float
-		this.rfaIVvert.read 		stream_FP #float
 		this.rfaIVHorz.read 		stream_FP #float
+		this.rfaIVvert.read 		stream_FP #float
 		this.rfaLifeTime.read 		stream_FP #float
 		this.rfaLifeTimeR.read 		stream_FP #float
 
@@ -2086,12 +2099,13 @@ struct M3S_PAR
 		if(flag == 0x0C)then
 		(
 			M3F_SkipBytes stream_FP 4
+			local world_space = readLong stream_FP #unsigned
+			if(world_space != 0)then(this.parFlags.bits[4] = true)
 		)
 		this.pLocalChns = 			readLong stream_FP #unsigned
 		
 		case flag of
 		(
-			0x0C: M3F_SkipBytes stream_FP 8
 			0x18: M3F_SkipBytes stream_FP 8
 			default: M3F_SkipBytes stream_FP 4
 		)
@@ -2138,8 +2152,8 @@ struct M3S_PAR
 		this.bounce = 				readFloat stream_FP
 		this.friction = 			readFloat stream_FP
 		this.colSpawnIdx = 			readLong stream_FP #unsigned
-		this.colSpawnMin = 			readFloat stream_FP
-		this.colSpawnMax = 			readFloat stream_FP
+		this.colSpawnMin = 			readLong stream_FP #unsigned
+		this.colSpawnMax = 			readLong stream_FP #unsigned
 		this.colSpawnChance = 		readFloat stream_FP
 		this.colSpawnEnergy = 		readFloat stream_FP
 		this.colDieBounce = 		readLong stream_FP #unsigned
@@ -2183,7 +2197,7 @@ struct M3S_PAR
 
 		this.rfaPtVelocity.read 	stream_FP #float
 
-		if(flag == 0x0C or flag == 0x12 or flag == 0x15)then
+		if(flag <= 0x15)then
 		(
 			this.rfaOverlay.init 	t:#float
 		)else
@@ -2192,36 +2206,36 @@ struct M3S_PAR
 		)
 		
 		this.parFlags1.valSet		(readLong stream_FP #unsigned)
+		if(flag == 0x0C)then(M3F_SkipBytes stream_FP 4)
 		this.parFlags2.valSet		(readLong stream_FP #unsigned)
+
 		if(flag == 0x0C)then
 		(
-			M3F_SkipBytes stream_FP 8
-		)
-		this.colorSmootying = 		readLong stream_FP #unsigned
-		this.sizeSmootying = 		readLong stream_FP #unsigned
-		this.rotSmootying = 		readLong stream_FP #unsigned
-		if(flag == 0x0C)then
-		(
+			M3F_SkipBytes stream_FP 4
+			this.colorSmootying = 0
+			this.sizeSmootying = 0
+			this.rotSmootying = 0
 			this.rfaAlphaThold.init t:#float
 			this.rfaUVoffset.init 	t:#v2d
 			this.rfaAngle.init 		t:#v3d
 			this.rfaUVtill.init 	t:#v2d
 			this.rfdSplatLine.init 	undefined
-			this.pWindMult = 		0
-			this.pLODreduce = 		0
-			this.pLODcut = 			0
 		)else
 		(
+			this.colorSmootying = 	readLong stream_FP #unsigned
+			this.sizeSmootying = 	readLong stream_FP #unsigned
+			this.rotSmootying = 	readLong stream_FP #unsigned
 			this.rfaAlphaThold.read 	stream_FP #float
 			this.rfaUVoffset.read 		stream_FP #v2d
 			this.rfaAngle.read 			stream_FP #v3d
 			this.rfaUVtill.read 		stream_FP #v2d
 			this.rfdSplatLine.readRef 	stream_FP
 			this.rfdSplatLine.readData 	stream_FP tags_FP
-			this.pWindMult = 			readFloat stream_FP
-			this.pLODreduce = 			readLong stream_FP #unsigned
-			this.pLODcut = 				readLong stream_FP #unsigned
 		)
+
+		this.pWindMult = 			readFloat stream_FP
+		this.pLODreduce = 			readLong stream_FP #unsigned
+		this.pLODcut = 				readLong stream_FP #unsigned
 
 		this.rfaLowBound.read 		stream_FP #float
 		this.rfaUpBound.read 		stream_FP #float
@@ -2492,7 +2506,7 @@ struct M3S_PROJ
 		this.attack = M3F_ReadRawData stream_FP #v2d
 		this.hold = M3F_ReadRawData stream_FP #v2d
 		this.decay = M3F_ReadRawData stream_FP #v2d
-		this.splatAtt = readShort stream_FP
+		this.splatAtt = readFloat stream_FP
 		this.rfaAlive.read stream_FP #uint32
 		this.layer = readLong stream_FP #unsigned
 		this.LODreduce = readLong stream_FP #unsigned
@@ -2681,6 +2695,7 @@ struct M3S_FileMain
 	fn read stream_FP =
 	(
 		local i, m, nbr_tags
+		local name_collect = #()
 
 		this.fHeader.read stream_FP
 		this.fTags.entry = this.fHeader.ofsTag
@@ -2689,6 +2704,14 @@ struct M3S_FileMain
 
 		for i=1 to nbr_tags do
 		(
+			if((findItem name_collect this.fTags.nameStr[i]) == 0)then
+			(
+				appendIfUnique name_collect this.fTags.nameStr[i]
+				format "% flag:% cnt:%\n" \
+					this.fTags.nameStr[i] \
+					(formattedPrint this.fTags.tags[i].flag format:"0#2x") \
+					this.fTags.tags[i].nbr
+			)
 			case this.fTags.nameStr[i] of
 			(
 				"MODL":
@@ -2906,7 +2929,10 @@ fn M3F_CopyController obj_FP target_FP type:#all=
 	if(type == #all or type == #scale)then
 	(
 		obj_FP.scale.controller = target_FP.scale.controller
-		obj_FP.scale.controller = bezier_scale()
+		obj_FP.scale.controller = ScaleXYZ()
+		obj_FP.scale.controller.x_scale.controller = bezier_float()
+		obj_FP.scale.controller.y_scale.controller = bezier_float()
+		obj_FP.scale.controller.z_scale.controller = bezier_float()
 	)
 	if(type == #all or type == #visibility)then
 	(
@@ -3077,10 +3103,33 @@ fn M3F_FrameCorrect obj_FP frames_FP keys_FP start_FP end_FP pose_FP c:false mul
 			(
 				if(c)then(dkey_data_end = (M3F_CvtType type keys_FP[n])*mult)
 				else(dkey_data_end = M3F_CvtType type keys_FP[n])
+				if(n > 1)then
+				(
+					local last_ftime = frames_FP[n-1] * glb_frame_rate / 1000.0
+					local linear_amp = (lens + 1 - last_ftime) / (ftime - last_ftime)
+
+					case classOf dkey_data_end of
+					(
+						Integer:
+						(
+							local float_temp = dkey_data_cur + (dkey_data_end - dkey_data_cur) * linear_amp
+							if(float_temp > 0)then(dkey_data_end = (float_temp + 0.5) as Integer)
+							else(dkey_data_end = (float_temp - 0.5) as Integer)
+						)
+						BooleanClass:()
+						default:
+						(
+							try
+							(
+								dkey_data_end = dkey_data_cur + (dkey_data_end - dkey_data_cur) * linear_amp
+							)catch()
+						)
+					)
+				)
 			)
 			continue
 		)
-		local itime = (floor ftime) as integer
+		local itime = (floor ftime) as Integer
 		local deviation = ftime - itime
 
 		if(deviation > 0.95)then
@@ -3255,16 +3304,25 @@ fn M3F_AnimApply flag_FP obj1_FP obj2_FP str1_FP str2_FP \
 					(
 						local stc_idx = k + 1
 						local anim_id = m3_stc[stc_idx].rfdAnimID.data
+						
 						if((n=(findItem anim_id m3_object.animID))==0)then(continue)
 
 						local sd_idx1 = m3_stc[stc_idx].rfdAnimRef.data[n][1] + 1
 						local sd_idx2 = m3_stc[stc_idx].rfdAnimRef.data[n][2] + 1
 						local keys = \
-					m3_stc[stc_idx].rfdAnimDatas[sd_idx2].data[sd_idx1].rfdKeys.data
+							m3_stc[stc_idx].rfdAnimDatas[sd_idx2].data[sd_idx1].rfdKeys.data
 						local frames = \
-					m3_stc[stc_idx].rfdAnimDatas[sd_idx2].data[sd_idx1].rfdFrames.data
+							m3_stc[stc_idx].rfdAnimDatas[sd_idx2].data[sd_idx1].rfdFrames.data
 						local anim_prop = seq[i]
-						
+
+						--if(temp == #start)then
+						--(
+						--	for m=1 to frames.count do
+						--	(
+						--		format "% f:% k:%\n" i frames[m] keys[m]
+						--	)
+						--)
+
 						M3F_FrameCorrect this_object frames keys \
 						anim_prop.animStart anim_prop.animEnd \
 						m3_object.initState c:c mult:mult type:type
@@ -3316,6 +3374,8 @@ fn M3F_AnimApply flag_FP obj1_FP obj2_FP str1_FP str2_FP \
 				)
 				BezierDefaultParams.inTangentType = ipt_type
 				BezierDefaultParams.outTangentType = ipt_type
+				--BezierDefaultParams.inTangentType = #linear
+				--BezierDefaultParams.outTangentType = #linear
 				
 				with animate on
 				(
@@ -3405,20 +3465,32 @@ struct M3SD_ScMapLayer
 			(
 				if(this.MapType == 1)then
 				(
+					/*
+					format "name:% flag:% uvmapping:%\n" \
+						source_FP.rfdName.data \
+						(formattedprint (source_FP.flags.valGet()) format:"0#8x") \
+						source_FP.mapping
+					--*/
+
 					this.UVMapping = case source_FP.mapping of
 					(
-						0: 0
-						1: 1
-						2: 2
+						0:	--UV1 or UV2
+						(
+							if(source_FP.flags.bits[14])then(1)else(0)
+						)
+						1: 1	--UV2
+						2: 2	--Reflective Cubic Env
 						3: 3
 						4: 4
 						5: 5
-						6:
+						6:	--Particle UV1 or UV2
 						(
 							if(source_FP.flags.bits[14])then(1)else(0)
 						)
 						7: 6
 						8: 7
+						9: 8	--UV3
+						10: 9	--UV4
 						11: 10
 						12: 11
 						13: 12
@@ -4745,18 +4817,33 @@ struct M3SD_ScSubRib
 	PitchFunctionOverlay 			,--() : integer
 	PitchFunctionAmplitude 			= M3SD_ScAnimData(),--() : float
 	PitchFunctionFrequency 			= M3SD_ScAnimData(),--() : float
-	InitialVelocitySpeedMin 		,--() : float
+	InitialVelocitySpeedMin 		= M3SD_ScAnimData(),--() : float
 	SpeedFunctionOverlay 			,--() : integer
 	SpeedFunctionAmplitude 			= M3SD_ScAnimData(),--() : float
 	SpeedFunctionFrequency 			= M3SD_ScAnimData(),--() : float
 
 	fn copyData source_FP seq: m3: dir:#fromfile =
 	(
+		local base_speed = 1.0
+		case dir of
+		(
+			#fromfile:
+			(
+				base_speed = if(source_FP.subRibSpeed == 0)then
+					(100.0)else(source_FP.subRibSpeed * 100.0)
+			)
+			#tofile:
+			()
+			default:
+			()
+		)
+
+		M3F_AnimApply dir this source_FP \
+			"InitialVelocitySpeedMin" "rfaSubSpeedMult" seq:seq m3:m3 c:true mult:base_speed
+
 		M3F_DataApply dir this source_FP "YawFunctionOverlay" 		"yawType"
 		M3F_DataApply dir this source_FP "PitchFunctionOverlay" 	"pitchType"
 		M3F_DataApply dir this source_FP "SpeedFunctionOverlay" 	"speedType"
-		M3F_DataApply dir this source_FP "InitialVelocitySpeedMin" 	"subRibSpeed" \
-		c:true f1:"* 100.0" f2:"/ 100.0"
 
 		M3F_AnimApply dir this source_FP \
 			"InitialVelocityYaw" "rfaYaw" seq:seq m3:m3
@@ -4817,10 +4904,10 @@ struct M3SD_ScProject
 		(
 			#fromfile:
 			(
-				this.AttackUseRange 		= true
-				this.HoldUseRange 			= true
-				this.DecayUseRange 			= true
-				this.HoldInfinite 			= false
+				this.AttackUseRange = if(source_FP.attack[2] == 0)then(false)else(true)
+				this.HoldUseRange = if(source_FP.attack[2] == 0)then(false)else(true)
+				this.DecayUseRange = if(source_FP.attack[2] == 0)then(false)else(true)
+				this.HoldInfinite = false
 				if(source_FP.splatAtt > 1)then
 				(
 					this.UseAttenuation = true
@@ -4829,6 +4916,20 @@ struct M3SD_ScProject
 				(
 					this.UseAttenuation = false
 					this.AttenuationPercent = 0
+				)
+				this.SplatLayer = case source_FP.layer of
+				(
+					0: 0
+					1: 1
+					2: 2
+					3: 3
+					4: 4
+					6: 5
+					7: 6
+					8: 7
+					11: 8
+					12: 9
+					default: 0
 				)
 			)
 			#tofile:
@@ -4843,6 +4944,7 @@ struct M3SD_ScProject
 				M3F_DataApply dir this source_FP "HoldInfinite" 			""
 				M3F_DataApply dir this source_FP "UseAttenuation" 			""
 				M3F_DataApply dir this source_FP "AttenuationPercent" 		""
+				M3F_DataApply dir this source_FP "SplatLayer" 				""
 			)
 		)
 		
@@ -4861,7 +4963,6 @@ struct M3SD_ScProject
 		M3F_DataApply dir this source_FP "DecayMaxTime" 			"decay[2]"
 		
 		M3F_DataApply dir this source_FP "StaticPosition" "staticPos" o:"=M3F_CvtType #bool "
-		M3F_DataApply dir this source_FP "SplatLayer" 				"layer"
 		M3F_DataApply dir this source_FP "SplatLODReduction" 		"LODreduce"
 		M3F_DataApply dir this source_FP "SplatLODCut" 				"LODcut"
 		
@@ -5176,11 +5277,12 @@ struct M3S_ScTrackSet
 	(
 		local this_item
 		try(this_item = this)catch(this_item = M3S_ScTrackSet())
-		try(this_item.buildSceneData m t)catch(throw())
+		try(this_item.buildSceneData m t)catch
+		(print ("TrackSetError:"+getCurrentException()); throw())
 		return this_item
 	),
 
-	fn releaseData behholder_FP scmat_FP scbone_FP sclight_FP sccam_FP scpar_FP scphy_FP scevent_FP =
+	fn releaseData behholder_FP scmat_FP scbone_FP sclight_FP sccam_FP scpar_FP scphy_FP scevent_FP schelp_FP =
 	(
 		local i
 		local behavior_type = M3F_GetCustAttr #trackset
@@ -5307,6 +5409,10 @@ struct M3S_ScTrackSet
 				(
 					local the_obj = scevent_FP[index3].theEvent
 				)
+				8:--Helpers
+				(
+					local the_obj = schelp_FP[index3].theHelper
+				)
 			)
 			local find_idx = findItem behavior.bonelist the_obj
 			if(find_idx == 0)then
@@ -5325,28 +5431,35 @@ struct M3S_ScTrackSet
 		local i
 		local m3_stc = m3obj_FP.fSTC
 		local m3_sts = m3obj_FP.fSTS
-		local sts_idx
+		local sts_idx = 0
 
 		this.nameStr = copy track_FP
 
-		for i=1 to m3_stc.count do
+		if(matchPattern this.nameStr pattern:"EmptyTrackSet_*")then
 		(
-			if((findString m3_stc[i].rfdName.data this.nameStr) != undefined)then
-			(
-				local anim_name = subString m3_stc[i].rfdName.data 1 \
-				(m3_stc[i].rfdName.data.count - this.nameStr.count - 1)
-				append animPropList anim_name
-				append priorityList m3_stc[i].animPriority
-				sts_idx = m3_stc[i].idxSTS + 1
-			)
-		)
-
-		if(m3_sts[sts_idx].rfdAnimID.data != undefined)then
-		(
-			this.animIDlist = deepCopy m3_sts[sts_idx].rfdAnimID.data
+			local anim_name = subString this.nameStr 15 -1
+			this.animPropList = #(anim_name)
+			this.priorityList = #(0)
 		)else
 		(
-			this.animIDlist = #(0)
+			for i=1 to m3_stc.count do
+			(
+				if((findString m3_stc[i].rfdName.data this.nameStr) != undefined)then
+				(
+					local anim_name = subString m3_stc[i].rfdName.data 1 \
+					(m3_stc[i].rfdName.data.count - this.nameStr.count - 1)
+					append this.animPropList anim_name
+					append this.priorityList m3_stc[i].animPriority
+					sts_idx = m3_stc[i].idxSTS + 1
+				)
+			)
+			if(sts_idx > 0)then
+			(
+				if(m3_sts[sts_idx].rfdAnimID.data != undefined)then
+				(
+					this.animIDlist = deepCopy m3_sts[sts_idx].rfdAnimID.data
+				)
+			)
 		)
 	),
 
@@ -5374,7 +5487,8 @@ struct M3S_ScAnimProp
 	(
 		local this_item
 		try(this_item = this)catch(this_item = M3S_ScAnimProp())
-		try(this_item.buildSceneData m i)catch(throw())
+		try(this_item.buildSceneData m i)catch
+		(print ("AnimPropError:"+getCurrentException()); throw())
 		return this_item
 	),
 
@@ -5417,11 +5531,13 @@ struct M3S_ScAnimProp
 
 		this.defaultPriority = 0
 		local patternstr = this.nameStr+"_*"
+		local default_concurrent = 0
 		for i=1 to m3_animset.count do
 		(
 			if(m3_animset[i].rfdName.data == (this.nameStr+"_full"))then
 			(
 				this.defaultPriority = m3_animset[i].animPriority
+				default_concurrent = m3_animset[i].runsConcurrent
 			)else
 			(
 				if(matchPattern m3_animset[i].rfdName.data \
@@ -5432,6 +5548,10 @@ struct M3S_ScAnimProp
 					append this.tracksetsList ss
 				)
 			)
+		)
+		if(this.tracksetsList.count == 0 and this.subAnim and default_concurrent == 1)then
+		(
+			append this.tracksetsList ("EmptyTrackSet_" + this.nameStr)
 		)
 
 		this.value = this.nameStr + 										"\r\n"+\
@@ -5453,8 +5573,8 @@ struct M3S_ScMaterial
 	(
 		local this_item
 		try(this_item = this)catch(this_item = M3S_ScMaterial())
-		--try(this_item.buildSceneData m s t i)catch(throw())
-		this_item.buildSceneData m s t i
+		try(this_item.buildSceneData m s t i)catch
+		(print ("MaterialError:"+getCurrentException()); throw())
 		return this_item
 	),
 
@@ -5821,9 +5941,9 @@ struct M3S_ScMaterial
 struct M3S_ScBone
 (
 	nameStr = "", parentBone, bindingPose,
-	Position = M3SD_ScAnimData(),
-	Rotation = M3SD_ScAnimData(),
-	Scale = M3SD_ScAnimData(),
+	dPosition = M3SD_ScAnimData(),
+	dRotation = M3SD_ScAnimData(),
+	dScale = M3SD_ScAnimData(),
 	Visibility = M3SD_ScAnimData(),
 	theBone, theObj, boneType = 0,
 
@@ -5831,7 +5951,8 @@ struct M3S_ScBone
 	(
 		local this_item
 		try(this_item = this)catch(this_item = M3S_ScBone())
-		try(this_item.buildSceneData m s t i)catch(throw())
+		try(this_item.buildSceneData m s t i)catch
+		(print ("BoneError:"+getCurrentException()); throw())
 		return this_item
 	),
 
@@ -5868,8 +5989,11 @@ struct M3S_ScBone
 				(
 					2: this.theBone.boxsize = [10,10,10]
 					4: this.theBone.boxsize = [7.5,7.5,7.5]
+					6: this.theBone.boxsize = [7.5,7.5,7.5]
 				)
 			)
+			if(classOf this.theBone.Scale.controller != ScaleXYZ)then
+			(this.theBone.Scale.controller = ScaleXYZ())
 			this.theBone.name = this.nameStr
 
 			if(this.parentBone > 0 and this.parentBone < 0xFFFF)then
@@ -5894,8 +6018,6 @@ struct M3S_ScBone
 						)					
 					)
 				)
-				if(bone_FP[this.parentBone].boneType == 1)then
-				(bone_FP[this.parentBone].boneType = 3)
 				this.theBone.Parent = bone_FP[this.parentBone].theBone
 			)
 			if(this.boneType != 2)then
@@ -5906,16 +6028,7 @@ struct M3S_ScBone
 					(
 						this.theBone.Transform = this.bindingPose
 					)
-					in coordsys parent
-					(
-						at time 10
-						(
-							this.theBone.Rotation = this.Rotation.dkeys[1]
-							this.theBone.Position = this.Position.dkeys[1]
-							this.theBone.Scale = this.Scale.dkeys[1]
-							--this.theBone.SetSkinPose()
-						)
-					)
+					--this.theBone.SetSkinPose()
 				)
 			)else
 			(
@@ -5936,50 +6049,44 @@ struct M3S_ScBone
 
 		with animate on
 		(
-			if(this.Rotation.frames[1] != -1)then
+			for i=1 to this.dRotation.frames.count do
 			(
-				for i=2 to this.Rotation.frames.count do
+				at time this.dRotation.frames[i]
 				(
-					at time this.Rotation.frames[i]
+					local mtrx = matrix3 1
+					rotate mtrx (inverse this.dRotation.dkeys[i])
+					if(this.theBone.parent != undefined)then
 					(
-						local mtrx = matrix3 1
-						rotate mtrx (inverse this.Rotation.dkeys[i])
-						if(this.theBone.parent != undefined)then
-						(
-							mtrx = mtrx * this.theBone.parent.transform
-						)
+						mtrx = mtrx * this.theBone.parent.transform
+					)
 
-						this.theBone.transform = mtrx
-						deleteKey this.theBone.position.controller \
-						(numKeys this.theBone.position.controller)
-						deleteKey this.theBone.scale.controller \
-						(numKeys this.theBone.scale.controller)
-					)
+					this.theBone.transform = mtrx
+					deleteKey this.theBone.Position.controller \
+					(numKeys this.theBone.Position.controller)
+					deleteKey this.theBone.Scale.controller \
+					(numKeys this.theBone.Scale.controller)
 				)
 			)
-			if(this.Position.frames[1] != -1)then
+
+			for i=1 to this.dScale.frames.count do
 			(
-				for i=2 to this.Position.frames.count do
-				(
-					at time this.Position.frames[i]
-					(
-						in coordsys parent
-						(
-							this.theBone.pos = this.Position.dkeys[i]
-						)
-					)
-				)
+				addNewKey this.theBone.Scale.controller this.dScale.frames[i]
+				local index_temp = numKeys this.theBone.Scale.controller
+				this.theBone.Scale.controller.x_scale.Keys[index_temp].value = \
+					this.dScale.dkeys[i][1]*100
+				this.theBone.Scale.controller.y_scale.Keys[index_temp].value = \
+					this.dScale.dkeys[i][2]*100
+				this.theBone.Scale.controller.z_scale.Keys[index_temp].value = \
+					this.dScale.dkeys[i][3]*100
 			)
-			if(this.Scale.frames[1] != -1)then
+
+			for i=1 to this.dPosition.frames.count do
 			(
-				for i=2 to this.Scale.frames.count do
+				at time this.dPosition.frames[i]
 				(
-					at time this.Scale.frames[i]
+					in coordsys parent
 					(
-						in coordsys parent
-						(
-							this.theBone.Scale = this.Scale.dkeys[i]
-						)
+						this.theBone.pos = this.dPosition.dkeys[i]
 					)
 				)
 			)
@@ -6011,20 +6118,24 @@ struct M3S_ScBone
 											(m3_iref.matrix[4] * 100))
 
 		M3F_AnimApply #fromfile this m3_bone \
-		"Position" "rfaPos" seq:scseq_FP m3:m3obj_FP c:true mult:100.0 \
+		"dPosition" "rfaPos" seq:scseq_FP m3:m3obj_FP c:true mult:100.0 \
 		anim:"position" trk:track_FP tp:track_tp
 		M3F_AnimApply #fromfile this m3_bone \
-		"Rotation" "rfaRot" seq:scseq_FP m3:m3obj_FP c:true mult:1.0 \
+		"dRotation" "rfaRot" seq:scseq_FP m3:m3obj_FP c:true mult:1.0 \
 		anim:"rotation" trk:track_FP tp:track_tp
 		M3F_AnimApply #fromfile this m3_bone \
-		"Scale" "rfaScale" seq:scseq_FP m3:m3obj_FP c:true mult:1.0 \
+		"dScale" "rfaScale" seq:scseq_FP m3:m3obj_FP c:true mult:1.0 \
 		anim:"scale" trk:track_FP tp:track_tp
 		M3F_AnimApply #fromfile this m3_bone \
 		"Visibility" "rfaVisibility" seq:scseq_FP m3:m3obj_FP type:#bool \
 		anim:"visibility" trk:track_FP tp:track_tp
+
+		this.dRotation.frames[1] = 10
+		this.dScale.frames[1] = 10
+		this.dPosition.frames[1] = 10
 	),
 
-	fn buildBonesType list_FP type_FP idx_FP =
+	fn copyBonesType list_FP type_FP idx_FP =
 	(
 		local index = findItem list_FP idx_FP
 		if(index != 0)then
@@ -6033,9 +6144,32 @@ struct M3S_ScBone
 		)
 	),
 
+	fn buildBonesType scbone_FP scmesh_FP idx_FP =
+	(
+		local i
+		if(this.parentBone > 0 and this.parentBone < 0xFFFF)then
+		(
+			case scbone_FP[this.parentBone].boneType of
+			(
+				1: scbone_FP[this.parentBone].boneType = 3
+				5: scbone_FP[this.parentBone].boneType = 6
+			)
+		)
+		if(this.boneType == 5)then
+		(
+			for i=1 to scmesh_FP.count do
+			(
+				if((findItem scmesh_FP[i].skinBones idx_FP) != 0)then
+				(
+					this.boneType = 6
+					exit
+				)
+			)
+		)
+	),
+
 	fn deleteBones =
 	(
-		local obj
 		if((M3F_GetGlobalSettings #BoneEnable) != true)then
 		(
 			delete this.theBone
@@ -6044,13 +6178,15 @@ struct M3S_ScBone
 		case this.boneType of
 		(
 			1: delete this.theBone
+			5: delete this.theBone
 			3:
 			(
+				local obj
 				for obj in this.theBone.Children do
 				(
 					obj.Parent = this.theObj
 				)
-				delete this.theBone				
+				delete this.theBone
 			)
 			default:()
 		)
@@ -6067,7 +6203,8 @@ struct M3S_ScEvent
 	(
 		local this_item
 		try(this_item = this)catch(this_item = M3S_ScEvent())
-		try(this_item.buildSceneData m s t ib i)catch(throw())
+		try(this_item.buildSceneData m s t ib i)catch
+		(print ("EventError:"+getCurrentException()); throw())
 		return this_item
 	),
 
@@ -6183,7 +6320,7 @@ struct M3S_ScEvent
 
 struct M3S_ScMesh
 (
-	nameStr = "", rootBone,
+	nameStr = "", rootBone, nbrBone,
 	vertPos = #(), vertNormal = #(), vertColor = #(), vertWeightPair = #(),
 	faces = #(),  uvLayout = #(#(),#(),#(),#(),#(),#()), matIdx, skinBones = #(),
 	theMesh,
@@ -6192,7 +6329,8 @@ struct M3S_ScMesh
 	(
 		local this_item
 		try(this_item = this)catch(this_item = M3S_ScMesh())
-		try(this_item.buildSceneData m i)catch(throw())
+		try(this_item.buildSceneData m i)catch
+		(print ("MeshError:"+getCurrentException()); throw())
 		return this_item
 	),
 
@@ -6204,7 +6342,7 @@ struct M3S_ScMesh
 								vnorms:this.vertNormal	\
 								name:this.nameStr
 
-		for n=1 to 6 do
+		for n=1 to 5 do
 		(
 			if this.uvLayout[n].count == 0 then continue
 
@@ -6223,7 +6361,7 @@ struct M3S_ScMesh
 		for i=1 to this.vertColor.count do
 		(
 			meshop.setVertColor the_mesh 0 #(i) this.vertColor[i]
-			meshop.setVertAlpha the_mesh -2 #(i) this.vertColor[i][4]
+			meshop.setVertAlpha the_mesh -2 #(i) (this.vertColor[i][4] / 255.0)
 		)
 		
 		if(M3F_GetGlobalSettings #MeshSmoothEnable)then
@@ -6284,6 +6422,8 @@ struct M3S_ScMesh
 							setFaceSmoothGroup the_mesh new_facelist[i][n] (sgroup_val.valGet())
 						)
 					)
+					windows.processPostedMessages()
+					setWaitCursor()
 				)
 				3:
 				(
@@ -6323,6 +6463,8 @@ struct M3S_ScMesh
 							setFaceSmoothGroup the_mesh new_facelist[i][n] (sgroup_val.valGet())
 						)
 					)
+					windows.processPostedMessages()
+					setWaitCursor()
 				)
 			)
 		)
@@ -6395,8 +6537,11 @@ struct M3S_ScMesh
 					skinOps.ReplaceVertexWeights sk_mod i \
 					this.vertWeightPair[i].index this.vertWeightPair[i].weight
 				)
+				skinOps.RemoveZeroWeights sk_mod
 			)
 			modPanel.setCurrentObject the_mesh
+			windows.processPostedMessages()
+			setWaitCursor()
 		)
 
 		if(M3F_GetGlobalSettings #MeshWeldEnable)then
@@ -6416,7 +6561,13 @@ struct M3S_ScMesh
 			the_mesh.Material = scmat_FP[this.matIdx].theMat
 		)
 
-		M3F_CopyController the_mesh scbone_FP[this.rootBone].theBone type:#visibility
+		if(this.nbrBone < 0xFFFF)then
+		(
+			M3F_CopyController the_mesh scbone_FP[this.nbrBone].theBone type:#visibility
+		)else
+		(
+			M3F_CopyController the_mesh scbone_FP[this.rootBone].theBone type:#visibility
+		)
 
 		this.theMesh = the_mesh
 		update the_mesh
@@ -6441,7 +6592,11 @@ struct M3S_ScMesh
 
 		for i=1 to m3_bat.count do
 		(
-			if((m3_bat[i].meshID+1) == idx_FP)then(this.matIdx = m3_bat[i].matID + 1)
+			if((m3_bat[i].meshID+1) == idx_FP)then
+			(
+				this.matIdx = m3_bat[i].matID + 1
+				this.nbrBone = m3_bat[i].nbrBone + 1
+			)
 		)
 		
 		this.rootBone = m3_region.rootBone + 1
@@ -6465,7 +6620,14 @@ struct M3S_ScMesh
 				append this.uvLayout[n] [u, v, 0.0]
 			)
 
-			append this.vertColor (m3_vert[index].vColor / 255.0)
+			if(m3_vert[index].vColor != undefined)then
+			(
+				append this.vertColor \
+					[m3_vert[index].vColor[3], \
+					m3_vert[index].vColor[2], \
+					m3_vert[index].vColor[1], \
+					m3_vert[index].vColor[4]]
+			)
 			
 			local wbpair = M3SD_ScSkinData()
 			for j=1 to 4 do
@@ -6741,6 +6903,54 @@ struct M3S_ScMesh
 			default:()
 		)
 		return is_same_group
+	),
+
+	fn replaceSkinedBone scbone_FP =
+	(
+		local i, n, m
+
+		with redraw on
+		(
+			local sk_mod = this.theMesh.modifiers[#skin]
+			if(sk_mod != undefined)then
+			(
+				max views redraw
+				local delete_bone = 0
+				modPanel.setCurrentObject sk_mod
+				for i=1 to this.skinBones.count do
+				(
+					local index = this.skinBones[i]
+					if(scbone_FP[index].boneType == 1 or scbone_FP[index].boneType == 3)then
+					(
+						local old_cur = i - delete_bone
+						format "ReplaceWeights:% bone:%\n" this.nameStr scbone_FP[index].nameStr
+						skinOps.addBone sk_mod scbone_FP[index].theObj -1
+
+						local add_idx = skinOps.GetNumberBones sk_mod
+						skinOps.SelectBone sk_mod old_cur
+						skinOps.copySelectedBone sk_mod
+						skinOps.pasteToBone sk_mod add_idx
+
+						for n=1 to this.theMesh.numverts do
+						(
+							local bone_cnt = skinOps.GetVertexWeightCount sk_mod n
+							for m=1 to bone_cnt do
+							(
+								if(old_cur == (skinOps.GetVertexWeightBoneID sk_mod n m))then
+								(
+									skinOps.SetVertexWeights sk_mod n add_idx \
+										(skinOps.GetVertexWeight sk_mod n m)
+								)
+							)
+						)
+						skinOps.removebone sk_mod
+						delete_bone += 1
+					)
+				)
+				skinOps.RemoveZeroWeights sk_mod
+				modPanel.setCurrentObject this.theMesh
+			)
+		)
 	)
 )
 
@@ -6764,7 +6974,8 @@ struct M3S_ScLight
 	(
 		local this_item
 		try(this_item = this)catch(this_item = M3S_ScLight())
-		try(this_item.buildSceneData m s t i)catch(throw())
+		try(this_item.buildSceneData m s t i)catch
+		(print ("LightError:"+getCurrentException()); throw())
 		return this_item
 	),
 
@@ -6790,7 +7001,7 @@ struct M3S_ScLight
 				if(targetBone > 0)then
 				(scbone_FP[this.targetBone].theObj = the_target)
 
-				the_light.shadowLODCut = shadowLODcut
+				the_light.shadowLODCut = shadowLODcut + 1
 				M3F_AnimApply #toscene this the_light \
 				"falloff" ""
 				M3F_AnimApply #toscene this the_light \
@@ -6823,7 +7034,7 @@ struct M3S_ScLight
 		the_light.affectedByAO = this.affectedByAO
 		the_light.lightOpaqueObjects = this.lightOpaqueObj
 		the_light.lightTransparentObjects = this.lightTransObj
-		the_light.lightLODCut = this.LODcut
+		the_light.lightLODCut = this.LODcut + 1
 
 		M3F_AnimApply #toscene this the_light \
 		"diffuseColor" ""
@@ -6932,7 +7143,8 @@ struct M3S_ScCamera
 	(
 		local this_item
 		try(this_item = this)catch(this_item = M3S_ScCamera())
-		try(this_item.buildSceneData m s t i)catch(throw())
+		try(this_item.buildSceneData m s t i)catch
+		(print ("CameraError:"+getCurrentException()); throw())
 		return this_item
 	),
 
@@ -7066,17 +7278,19 @@ struct M3S_ScCamera
 	)
 )
 
-struct M3S_ScParicle
+struct M3S_ScParticle
 (
 	parType = 0, nameStr = "", nbrBone, nbrSubBone = 0, bindingPose, matIdx,
 	targetName, targetPos = matrix3 0, storeData, splatLine = #(), subRib,
 	thePar,
 
-	fn init m: s: t: i: f: =
+	fn init m: s: t: i: f: c: =
 	(
 		local this_item
-		try(this_item = this)catch(this_item = M3S_ScParicle())
-		try(this_item.buildSceneData m s t i f:f)catch(throw())
+		try(this_item = this)catch(this_item = M3S_ScParticle())
+		try(this_item.buildSceneData m s t i f:f c:c)catch
+		(print ("ParticleError:"+getCurrentException()); throw())
+
 		return this_item
 	),
 
@@ -7156,6 +7370,7 @@ struct M3S_ScParicle
  						the_particle2.transform = this.targetPos
  					)
  					this.subRib.copyData the_particle2 dir:#toscene
+ 					M3F_AddToLayer "Particle" the_particle2
 				)
 				this.storeData.copyData the_particle dir:#toscene
 			)
@@ -7187,7 +7402,7 @@ struct M3S_ScParicle
 
 	fn collectData =(),
 
-	fn buildSceneData m3obj_FP scseq_FP track_FP idx_FP f:#par =
+	fn buildSceneData m3obj_FP scseq_FP track_FP idx_FP f:#par c:0 =
 	(
 		local i
 		case f of
@@ -7214,7 +7429,7 @@ struct M3S_ScParicle
 		local m3_irefs = m3obj_FP.fIREF
 		local m3_object = m3obj_FP.fBONE[this.nbrBone]
 		local m3_iref = m3obj_FP.fIREF[this.nbrBone]
-		local track_tp = idx_FP * 10000 + 500
+		local track_tp = (c + 1) * 10000 + 500
 
 		for i=1 to track_FP.count do
 		(track_FP[i].swapBoneTrack this.nbrBone track_tp)
@@ -7225,7 +7440,7 @@ struct M3S_ScParicle
 									m3_iref.matrix[2] \
 									m3_iref.matrix[3] \
 									(m3_iref.matrix[4] * 100))
-
+		
 		case f of
 		(
 			#par:
@@ -7233,6 +7448,7 @@ struct M3S_ScParicle
 				this.parType = 1
 				this.storeData.copyData m3_particle trk:track_FP tp:track_tp \
 				seq:scseq_FP m3:m3obj_FP dir:#fromfile
+				
 				try
 				(
 					this.storeData.MeshLink = "Mesh " + \
@@ -7325,7 +7541,7 @@ struct M3S_ScParicle
 		(
 			local m3_par = case type_FP of(#par: m3obj_FP.fPAR; #proj: m3obj_FP.fPROJ)
 			local m3_bone = m3obj_FP.fBONE
-			local bone_idx = m3_par[link_FP].nbrBone
+			local bone_idx = m3_par[link_FP].nbrBone + 1
 			return (copy m3_bone[bone_idx].rfdName.data)
 		)else
 		(
@@ -7339,11 +7555,12 @@ struct M3S_ScPhysics
 	PhyType, nameStr = "", nbrBone, bindingPose,
 	storeData, thePhy,
 
-	fn init m: s: t: i: f: =
+	fn init m: s: t: i: f: c: =
 	(
 		local this_item
 		try(this_item = this)catch(this_item = M3S_ScPhysics())
-		try(this_item.buildSceneData m s t i f:f)catch(throw())
+		try(this_item.buildSceneData m s t i f:f c:c)catch
+		(print ("PhysicsError:"+getCurrentException()); throw())
 		return this_item
 	),
 
@@ -7357,7 +7574,7 @@ struct M3S_ScPhysics
 			)
 			2:
 			(
-				local the_physics = SC2VertexWarp()
+				local the_physics = SC2VtxWarp()
 			)
 			3:
 			(
@@ -7428,7 +7645,7 @@ struct M3S_ScPhysics
 	),
 	fn collectData =(),
 
-	fn buildSceneData m3obj_FP scseq_FP track_FP idx_FP f:#force =
+	fn buildSceneData m3obj_FP scseq_FP track_FP idx_FP f:#force c:0 =
 	(
 		local i
 		case f of
@@ -7557,7 +7774,7 @@ struct M3S_ScPhysics
 		local m3_bone = m3obj_FP.fBONE
 		local m3_object = m3obj_FP.fBONE[this.nbrBone]
 		local m3_iref = m3obj_FP.fIREF[this.nbrBone]
-		local track_tp = idx_FP * 10000 + 600
+		local track_tp = (c + 1) * 10000 + 600
 
 		for i=1 to track_FP.count do
 		(track_FP[i].swapBoneTrack this.nbrBone track_tp)
@@ -7586,7 +7803,8 @@ struct M3S_ScJoint
 	(
 		local this_item
 		try(this_item = this)catch(this_item = M3S_ScJoint())
-		try(this_item.buildSceneData m i)catch(throw())
+		try(this_item.buildSceneData m i)catch
+		(print ("JointError:"+getCurrentException()); throw())
 		return this_item
 	),
 
@@ -7659,12 +7877,14 @@ struct M3S_ScHelper
 (
 	nameStr = "", nbrBone, helperType, bindingPose,
 	axisMatrix, size0, size1, size2,
+	theHelper,
 
-	fn init m: i: f: =
+	fn init m: t: i: f: c: =
 	(
 		local this_item
 		try(this_item = this)catch(this_item = M3S_ScHelper())
-		try(this_item.buildSceneData m i f:f)catch(throw())
+		try(this_item.buildSceneData m t i f:f c:c)catch
+		(print ("HelperError:"+getCurrentException()); throw())
 		return this_item
 	),
 
@@ -7727,7 +7947,12 @@ struct M3S_ScHelper
 					freeze the_helper
 				)
 			)
+			local self_bone = scbone_FP[this.nbrBone]
+			self_bone.theObj = the_helper
+			if(self_bone.parentBone > 0 and self_bone.parentBone < 0xFFFF)then
+			(the_helper.parent = scbone_FP[self_bone.parentBone].theBone)
 
+			M3F_CopyController the_helper self_bone.theBone
 			M3F_AddToLayer "HitTest" the_helper
 		)else
 		(
@@ -7741,21 +7966,24 @@ struct M3S_ScHelper
 				the_helper.null.displayName = false
 				freeze the_helper
 			)
+			local self_bone = scbone_FP[this.nbrBone]
+			self_bone.theObj = the_helper
+			if(self_bone.parentBone > 0 and self_bone.parentBone < 0xFFFF)then
+			(the_helper.parent = scbone_FP[self_bone.parentBone].theBone)
+
+			M3F_CopyController the_helper self_bone.theBone type:#rot
+			M3F_CopyController the_helper self_bone.theBone type:#pos
+			if(classOf the_helper.Scale.controller != ScaleXYZ)then
+			(the_helper.Scale.controller = ScaleXYZ())
 			M3F_AddToLayer "Attachment Point" the_helper
 		)
-		local self_bone = scbone_FP[this.nbrBone]
-		self_bone.theObj = the_helper
 		the_helper.transform = this.bindingPose
 
-		if(self_bone.parentBone > 0 and self_bone.parentBone < 0xFFFF)then
-		(the_helper.parent = scbone_FP[self_bone.parentBone].theBone)
-
-		M3F_CopyController the_helper self_bone.theBone
-		--delete self_bone.theBone
+		this.theHelper = the_helper
 	),
 	fn collectData =(),
 
-	fn buildSceneData m3obj_FP idx_FP f:#attach =
+	fn buildSceneData m3obj_FP track_FP idx_FP f:#attach c:0 =
 	(
 		case f of
 		(
@@ -7785,6 +8013,13 @@ struct M3S_ScHelper
 		this.nbrBone = m3_helper.nbrBone + 1
 		local m3_object = m3obj_FP.fBONE[this.nbrBone]
 		local m3_iref = m3obj_FP.fIREF[this.nbrBone]
+		local track_tp = (c + 1) * 10000 + 800
+
+		if((matchPattern this.nameStr pattern:"Ref_Target*" ignoreCase:false) != true)then
+		(
+			for i=1 to track_FP.count do
+			(track_FP[i].swapBoneTrack this.nbrBone track_tp)
+		)
 
 		if(f != #attach)then(this.nameStr = copy m3_object.rfdName.data)
 
@@ -7810,7 +8045,7 @@ struct M3S_SceneMain
 (
 	sAnimProp = #(), sTrackSet = #(), sJoint = #(),
 	sBone = #(), sEvent = #(), sMesh = #(), sLight = #(), sCamera = #(),
-	sParicle = #(), sPhysics = #(), sHelper = #(), sMaterial = #(),
+	sParticle = #(), sPhysics = #(), sHelper = #(), sMaterial = #(),
 	theMain,
 
 	fn releaseData =
@@ -7943,15 +8178,15 @@ struct M3S_SceneMain
 			--releaseParticles
 			M3F_ShowPhase "Releasing Particles ..."
 			print "Releasing Particles ..."
-			for i=1 to this.sParicle.count do
+			for i=1 to this.sParticle.count do
 			(
 				M3F_FillProgressLv flag:#execute
-				this.sParicle[i].releaseData this.sBone this.sMaterial
+				this.sParticle[i].releaseData this.sBone this.sMaterial
 			)
 		)else
 		(
 			M3F_ShowPhase "Skip Particles!"
-			M3F_FillProgressLv step:this.sParicle.count flag:#execute
+			M3F_FillProgressLv step:this.sParticle.count flag:#execute
 		)
 
 		if(M3F_GetGlobalSettings #PhyEnable)then
@@ -8037,14 +8272,26 @@ struct M3S_SceneMain
 				this.sBone \
 				this.sLight \
 				this.sCamera \
-				this.sParicle \
+				this.sParticle \
 				this.sPhysics \
-				this.sEvent
+				this.sEvent \
+				this.sHelper
 			)
 		)else
 		(
 			M3F_ShowPhase "Skip TrackSets!"
 			M3F_FillProgressLv step:this.sTrackSet.count flag:#execute
+		)
+
+		--ReplaceWeights
+		if(M3F_GetGlobalSettings #SkinEnable)then
+		(
+			max modify mode
+			for i=1 to this.sMesh.count do
+			(
+				this.sMesh[i].replaceSkinedBone this.sBone
+			)
+			max create mode
 		)
 
 		--cleanBones
@@ -8157,6 +8404,8 @@ struct M3S_SceneMain
 				append this.sMesh (M3S_ScMesh.init m:m3obj_FP i:i)
 				append exceptBones this.sMesh[i].rootBone
 				append bonesType 2
+				append exceptBones this.sMesh[i].nbrBone
+				append bonesType 5
 			)
 		)
 		M3F_FillProgressLv step:2 flag:#current
@@ -8200,32 +8449,32 @@ struct M3S_SceneMain
 		for i=1 to m3obj_FP.fPAR.count do
 		(
 			M3F_FillProgressLv()
-			append this.sParicle \
-			(M3S_ScParicle.init m:m3obj_FP s:this.sAnimProp t:this.sTrackSet \
-				i:i f:#par)
-			append exceptBones this.sParicle[i].nbrBone
+			append this.sParticle \
+			(M3S_ScParticle.init m:m3obj_FP s:this.sAnimProp t:this.sTrackSet \
+				i:i f:#par c:this.sParticle.count)
+			append exceptBones this.sParticle[i].nbrBone
 			append bonesType 1
 		)
 		format "RibbonsCount:%\n" m3obj_FP.fRIB.count
 		for i=1 to m3obj_FP.fRIB.count do
 		(
 			M3F_FillProgressLv()
-			append this.sParicle \
-			(M3S_ScParicle.init m:m3obj_FP s:this.sAnimProp t:this.sTrackSet \
-				i:i f:#rib)
-			append exceptBones this.sParicle[this.sParicle.count].nbrBone
+			append this.sParticle \
+			(M3S_ScParticle.init m:m3obj_FP s:this.sAnimProp t:this.sTrackSet \
+				i:i f:#rib c:this.sParticle.count)
+			append exceptBones this.sParticle[this.sParticle.count].nbrBone
 			append bonesType 1
-			append exceptBones this.sParicle[this.sParicle.count].nbrSubBone
+			append exceptBones this.sParticle[this.sParticle.count].nbrSubBone
 			append bonesType 1
 		)
 		format "ProjectorsCount:%\n" m3obj_FP.fPROJ.count
 		for i=1 to m3obj_FP.fPROJ.count do
 		(
 			M3F_FillProgressLv()
-			append this.sParicle \
-			(M3S_ScParicle.init m:m3obj_FP s:this.sAnimProp t:this.sTrackSet \
-				i:i f:#proj)
-			append exceptBones this.sParicle[this.sParicle.count].nbrBone
+			append this.sParticle \
+			(M3S_ScParticle.init m:m3obj_FP s:this.sAnimProp t:this.sTrackSet \
+				i:i f:#proj c:this.sParticle.count)
+			append exceptBones this.sParticle[this.sParticle.count].nbrBone
 			append bonesType 1
 		)
 		M3F_FillProgressLv step:2 flag:#current
@@ -8239,7 +8488,7 @@ struct M3S_SceneMain
 			M3F_FillProgressLv()
 			append this.sPhysics \
 			(M3S_ScPhysics.init m:m3obj_FP s:this.sAnimProp t:this.sTrackSet \
-				i:i f:#force)
+				i:i f:#force c:this.sPhysics.count)
 			append exceptBones this.sPhysics[i].nbrBone
 			append bonesType 1
 		)
@@ -8249,7 +8498,7 @@ struct M3S_SceneMain
 			M3F_FillProgressLv()
 			append this.sPhysics \
 			(M3S_ScPhysics.init m:m3obj_FP s:this.sAnimProp t:this.sTrackSet \
-				i:i f:#warp)
+				i:i f:#warp c:this.sPhysics.count)
 			append exceptBones this.sPhysics[this.sPhysics.count].nbrBone
 			append bonesType 1
 		)
@@ -8259,7 +8508,7 @@ struct M3S_SceneMain
 			M3F_FillProgressLv()
 			append this.sPhysics \
 			(M3S_ScPhysics.init m:m3obj_FP s:this.sAnimProp t:this.sTrackSet \
-				i:i f:#rigedbody)
+				i:i f:#rigedbody c:0)
 			--append exceptBones this.sPhysics[this.sPhysics.count].nbrBone
 			--append bonesType 1
 		)
@@ -8278,7 +8527,7 @@ struct M3S_SceneMain
 		if(m3obj_FP.fMODL.tightTest.nbrBone < 0xFFFF)then
 		(
 			M3F_FillProgressLv()
-			append this.sHelper (M3S_ScHelper.init m:m3obj_FP i:0 f:#tight)
+			append this.sHelper (M3S_ScHelper.init m:m3obj_FP t:this.sTrackSet i:1 f:#tight c:0)
 			append exceptBones this.sHelper[1].nbrBone
 			append bonesType 1
 		)
@@ -8288,7 +8537,8 @@ struct M3S_SceneMain
 			for i=1 to m3obj_FP.fMODL.rfdSSGS.data.count do
 			(
 				M3F_FillProgressLv()
-				append this.sHelper (M3S_ScHelper.init m:m3obj_FP i:i f:#fuzzy)
+				append this.sHelper \
+					(M3S_ScHelper.init m:m3obj_FP t:this.sTrackSet i:i f:#fuzzy c:this.sHelper.count)
 				append exceptBones this.sHelper[this.sHelper.count].nbrBone
 				append bonesType 1
 			)
@@ -8302,7 +8552,8 @@ struct M3S_SceneMain
 			for i=1 to m3obj_FP.fMODL.rfdATVL.data.count do
 			(
 				M3F_FillProgressLv()
-				append this.sHelper (M3S_ScHelper.init m:m3obj_FP i:i f:#attvol)
+				append this.sHelper \
+					(M3S_ScHelper.init m:m3obj_FP t:this.sTrackSet i:i f:#attvol c:this.sHelper.count)
 				append exceptBones this.sHelper[this.sHelper.count].nbrBone
 				append bonesType 1
 			)
@@ -8314,7 +8565,8 @@ struct M3S_SceneMain
 		for i=1 to m3obj_FP.fATT.attachments.count do
 		(
 			M3F_FillProgressLv()
-			append this.sHelper (M3S_ScHelper.init m:m3obj_FP i:i f:#attach)
+			append this.sHelper \
+				(M3S_ScHelper.init m:m3obj_FP t:this.sTrackSet i:i f:#attach c:this.sHelper.count)
 			append exceptBones this.sHelper[this.sHelper.count].nbrBone
 			append bonesType 1
 		)
@@ -8322,9 +8574,11 @@ struct M3S_SceneMain
 		
 		for i=1 to this.sBone.count do
 		(
-			this.sBone[i].buildBonesType exceptBones bonesType i
+			this.sBone[i].copyBonesType exceptBones bonesType i
 			--format "Name:% idx:% type:%\n" this.sBone[i].nameStr i this.sBone[i].boneType
 		)
+		for i=1 to this.sBone.count do
+		(this.sBone[i].buildBonesType this.sBone this.sMesh i)
 		M3F_FillProgressLv flag:#buildfinished
 	),
 
@@ -8374,12 +8628,26 @@ fn M3F_ImportMain file_FP =
 	M3F_FillProgressLv flag:#clear
 	--M3F_Star2CustAttrInit()
 
+	local time_range = animationRange
+	local slider_time = sliderTime
+
+	animationRange = interval 0 100
+	sliderTime = 0
+
 	local m3model =  M3S_FileMain()
 	local max_scene = M3S_SceneMain()
 
-	m3model.read streamR
-	max_scene.buildSceneData m3model
-	max_scene.releaseData()
+	try
+	(
+		m3model.read streamR
+		format "-------------------------------------\n"
+		max_scene.buildSceneData m3model
+		format "-------------------------------------\n"
+		max_scene.releaseData()
+	)catch(messageBox "Script Run Error!!!")
+
+	animationRange = time_range
+	sliderTime = slider_time
 
 	fClose streamR
 )

@@ -734,6 +734,7 @@ rollout M3P_TexToolUI "Textures Fix Tool" height:500 width:800
 
 		if(M3F_CheckStarTools #Info func:#gameDir)then
 		(local game_dir = StarTools.Info.GetDir #localBuild)else(return false)
+		setWaitCursor()
 
 		local i
 		local netClass = M3S_DotNetClass()
@@ -804,6 +805,8 @@ rollout M3P_TexToolUI "Textures Fix Tool" height:500 width:800
 								data_dir idx_dir find_item file_copy_dir
 							if(result == 0)then(file_exist = true)
 							format "ExtractFile: % ms\n" (timestamp()-time_)
+							windows.processPostedMessages()
+							setWaitCursor()
 						)
 					)
 
@@ -854,6 +857,7 @@ rollout M3P_TexToolUI "Textures Fix Tool" height:500 width:800
 			)
 		)
 		try(destroyDialog M3P_TexToolWaitUI)catch()
+		setArrowCursor()
 	)
 
 	fn applyBtn sender_FP e_FP =

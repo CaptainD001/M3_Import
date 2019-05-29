@@ -81,7 +81,7 @@ fn M3F_CheckStarTools type_FP func: =
 
 struct M3S_ImportInfo
 (
-	verison = "v1.6a",
+	verison = "v1.7",
 	toolsBtn = 1,
 	ExtractFileLib,
 	--Misc
