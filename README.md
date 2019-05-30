@@ -3,17 +3,19 @@ M3 files Import Tools 使用说明
 --------------------------------------------------------------------------------------
 **M3 files Import Tools** 是适用于 3dsMax 的一款m3模型文件导入插件，可以导入StarCraft2的相关模型到 3dsMax 中进行编辑修改。
 ## 下载
-* [跳转下载页面](https://github.com/CaptainD001/M3_Import/releases)
+* 本插件下载:[跳转下载页面](https://github.com/CaptainD001/M3_Import/releases)
+*  **`SC2StarArtTools for Max2016`** 下载:[跳转下载页面](https://github.com/CaptainD001/M3_Import/tree/SC2ArtTools)
 ## 使用注意
-* 本插件和 SC2StarArtTools 都只支持 **3dsMax 2011 x64**，其余版本的 3dsMax 无法使用。
+* 本插件v1.7a及以上版本和 **`SC2StarArtTools for Max2016`** 均支持 **3dsMax 2016 x64** 版本。
+* 本插件v1.7及以下版本和 **`SC2StarArtTools for Max2011`** 都只支持 **3dsMax 2011 x64**，其余版本的 3dsMax 无法使用。
 * 路径及文件名请全部使用英文，中文会引起运行错误。
 ## 安装/卸载/更新
 * #### 安装
-  * 需要提前安装SC2StarArtTools
-  * 复制`CaptainD-M3Import-vXX.mzp`脚本文件到`你Max的安装目录/Scripts/Startup`
-  * 启动3dsMax，工具栏会在最右边自动添加导入插件按钮
+  * 需要提前安装 **`SC2StarArtTools`**
+  * 复制 **`CaptainD-M3Import-vXX.mzp`** 脚本文件到 **`你Max的安装目录/Scripts/Startup`**
+  * 启动 3dsMax，工具栏会在最右边自动添加导入插件按钮
 * #### 卸载
-  * 删除 “CaptainD-M3Import-vXX.mzp”重启3dsmax即可
+  * 删除 “CaptainD-M3Import-vXX.mzp” 重启 3dsmax 即可
 
 * #### 更新
   * 删除旧版本 “CaptainD-M3Import-vXX.mzp” 脚本文件
