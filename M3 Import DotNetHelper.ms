@@ -1,4 +1,5 @@
 
+dotnet.loadAssembly @"$Temp\M3Import_mzp\MaxCustomControls_2011.dll"
 struct M3S_DotNetClass
 (
 	enumClass,
@@ -13,12 +14,15 @@ struct M3S_DotNetClass
 	anchorClass,
 	dragDropEffectsClass,
 	listViewItemClass,
+	AppearanceClass,
+	ContentAlignmentClass,
 
-	fn createCtl type_FP n: x: y: w: h: a: v:"Left" t: bc: =
+	fn createCtl type_FP n: x: y: w: h: a: v:"Left" t:"" ta: bc: =
 	(
 		local control
 		case type_FP of
 		(
+			#Form: control = dotNetObject "System.Windows.Forms.Form"
 			#SplitContainer: control = dotNetObject "System.Windows.Forms.SplitContainer"
 			#GroupBox: control = dotNetObject "System.Windows.Forms.GroupBox"
 			#Button: control = dotNetObject "System.Windows.Forms.Button"
@@ -28,8 +32,9 @@ struct M3S_DotNetClass
 			#TextBox: control = dotNetObject "System.Windows.Forms.TextBox"
 			#CheckBox: control = dotNetObject "System.Windows.Forms.CheckBox"
 			#ComboBox: control = dotNetObject "System.Windows.Forms.ComboBox"
+			#ProgressBar: control = dotNetObject "System.Windows.Forms.ProgressBar"
 
-			#ListViewItem: control = dotNetObject "System.Windows.Forms.ListViewItem" ""
+			#ListViewItem: control = dotNetObject "System.Windows.Forms.ListViewItem" t
 			default:(return undefined)
 		)
 		if(n != unsupplied)then
@@ -68,9 +73,24 @@ struct M3S_DotNetClass
 		(
 			control.Height = h
 		)
-		if(t != unsupplied)then
+		if(t.count != 0)then
 		(
 			control.Text = t
+		)
+		if(ta != unsupplied)then
+		(
+			case ta of
+			(
+				#BottomCenter: control.TextAlign = (this.getClass #ContentAlignment).BottomCenter
+				#BottomLeft: control.TextAlign = (this.getClass #ContentAlignment).BottomLeft
+				#BottomRight: control.TextAlign = (this.getClass #ContentAlignment).BottomRight
+				#MiddleCenter: control.TextAlign = (this.getClass #ContentAlignment).MiddleCenter
+				#MiddleLeft: control.TextAlign = (this.getClass #ContentAlignment).MiddleLeft
+				#MiddleRight: control.TextAlign = (this.getClass #ContentAlignment).MiddleRight
+				#TopCenter: control.TextAlign = (this.getClass #ContentAlignment).TopCenter
+				#TopLeft: control.TextAlign = (this.getClass #ContentAlignment).TopLeft
+				#TopRight: control.TextAlign = (this.getClass #ContentAlignment).TopRight
+			)
 		)
 		if(bc != unsupplied)then
 		(
@@ -120,18 +140,60 @@ struct M3S_DotNetClass
 		image_list
 	),
 
-	fn createObject type_FP =
+	fn createObject type_FP d1: d2: =
 	(
 		local net_obj
 		case type_FP of
 		(
 			#Point:
 			(
-				net_obj = dotNetObject "System.Drawing.Point" 0 0
+				local pos_x = if(d1 != unsupplied)then(d1)else(0)
+				local pos_y = if(d2 != unsupplied)then(d2)else(0)
+				net_obj = dotNetObject "System.Drawing.Point" pos_x pos_y
+			)
+			#Size:
+			(
+				local width = if(d1 != unsupplied)then(d1)else(0)
+				local height = if(d2 != unsupplied)then(d2)else(0)
+				net_obj = dotNetObject "System.Drawing.Size" width height
+			)
+			#Font:
+			(
+				local font_name = if(d1 != unsupplied)then(d1)else("Tahoma")
+				local font_size = if(d2 != unsupplied)then(d2)else(8.5)
+				net_obj = dotNetObject "System.Drawing.Font" font_name font_size
+			)
+			#Icon:
+			(
+				if(d1 != unsupplied)then
+				(
+					local icon_size = if(d2 != unsupplied)then(d2)else(32)
+					net_obj = dotNetObject "System.Drawing.Icon" d1 icon_size icon_size
+				)
+			)
+			#IntPtr:
+			(
+				if(d1 != unsupplied)then
+				(
+					net_obj = DotNetObject "System.IntPtr" d1
+				)
+			)
+			#Handle:
+			(
+				if(d1 != unsupplied)then
+				(
+					local dot_ptr = case classOf d1 of
+					(
+						Integer: DotNetObject "System.IntPtr" (d1 as IntegerPtr)
+						IntegerPtr: DotNetObject "System.IntPtr" d1
+						dotNetObject: d1
+						default: return undefined
+					)
+					net_obj = DotNetObject "MaxCustomControls.Win32HandleWrapper" dot_ptr
+				)
 			)
 			default:(return undefined)
 		)
-
 		net_obj
 	),
 
@@ -211,7 +273,18 @@ struct M3S_DotNetClass
 				(this.listViewItemClass = dotNetClass "System.Windows.Forms.ListViewItem")
 				this.listViewItemClass
 			)
-
+			#Appearance:
+			(
+				if(this.AppearanceClass == undefined)then
+				(this.AppearanceClass = dotNetClass "System.Windows.Forms.Appearance")
+				this.AppearanceClass
+			)
+			#ContentAlignment:
+			(
+				if(this.ContentAlignmentClass == undefined)then
+				(this.ContentAlignmentClass = dotNetClass "System.Drawing.ContentAlignment")
+				this.ContentAlignmentClass
+			)
 			default: undefined
 		)
 	)

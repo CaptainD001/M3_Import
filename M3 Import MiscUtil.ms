@@ -57,49 +57,49 @@ rollout M3P_TexToolUI "Textures Fix Tool" height:500 width:800
 
 	fn translateLanguage =
 	(
-		def_label.Text = 						M3F_AccessINI #language \
-			(M3S_INIdata local_language "TexTool_ColDef" "ColDefinition:") #load
-		red_label1.Text = 						M3F_AccessINI #language \
-			(M3S_INIdata local_language "TexTool_ColNot" "Texture not exist") #load
-		yellow_label1.Text = 					M3F_AccessINI #language \
-			(M3S_INIdata local_language "TexTool_ColApply" "Path not apply") #load
+		def_label.Text = \
+			M3F_ReadLanguage local_language "TexTool_ColDef"		"ColDefinition:"
+		red_label1.Text = \
+			M3F_ReadLanguage local_language "TexTool_ColNot"		"Texture not exist"
+		yellow_label1.Text = \
+			M3F_ReadLanguage local_language "TexTool_ColApply"		"Path not apply"
 
-		tex_list_view.Columns.Item[1].Text = 	M3F_AccessINI #language \
-			(M3S_INIdata local_language "TexTool_TexListTex" "Textures") #load
-		tex_list_view.Columns.Item[2].Text = 	M3F_AccessINI #language \
-			(M3S_INIdata local_language "TexTool_TexListPath" "Paths") #load
-		tex_group.Text = 						M3F_AccessINI #language \
-			(M3S_INIdata local_language "TexTool_TexGroup" "Textures") #load
-		source_radio_btn1.Text = 				M3F_AccessINI #language \
-			(M3S_INIdata local_language "TexTool_TexFrom1" "Textures from scene") #load
-		source_radio_btn2.Text = 				M3F_AccessINI #language \
-			(M3S_INIdata local_language "TexTool_TexFrom2" "Textures from file") #load
-		use_m3path_cbox.Text = 					M3F_AccessINI #language \
-			(M3S_INIdata local_language "TexTool_TexRootEnable" "(Use FilePath as RootPath)") #load
-		source_select_btn.Text = 				M3F_AccessINI #language \
-			(M3S_INIdata local_language "TexTool_TexSlt" "Select") #load
+		tex_list_view.Columns.Item[1].Text = \
+			M3F_ReadLanguage local_language "TexTool_TexListTex"	"Textures"
+		tex_list_view.Columns.Item[2].Text = \
+			M3F_ReadLanguage local_language "TexTool_TexListPath"	"Paths"
+		tex_group.Text = \
+			M3F_ReadLanguage local_language "TexTool_TexGroup"		"Textures"
+		source_radio_btn1.Text = \
+			M3F_ReadLanguage local_language "TexTool_TexFrom1"		"Textures from scene"
+		source_radio_btn2.Text = \
+			M3F_ReadLanguage local_language "TexTool_TexFrom2"		"Textures from file"
+		use_m3path_cbox.Text = \
+			M3F_ReadLanguage local_language "TexTool_TexRootEnable"	"(Use FilePath as RootPath)"
+		source_select_btn.Text = \
+			M3F_ReadLanguage local_language "TexTool_TexSlt"		"Select"
 
-		root_cbox.Text = 						M3F_AccessINI #language \
-			(M3S_INIdata local_language "TexTool_RootEnable" "Root Path:") #load
-		root_path_select_btn.Text = 			M3F_AccessINI #language \
-			(M3S_INIdata local_language "TexTool_RootSlt" "Select") #load
+		root_cbox.Text = \
+			M3F_ReadLanguage local_language "TexTool_RootEnable"	"Root Path:"
+		root_path_select_btn.Text = \
+			M3F_ReadLanguage local_language "TexTool_RootSlt"		"Select"
 
-		path_subfolder_cbox.Text = 				M3F_AccessINI #language \
-			(M3S_INIdata local_language "TexTool_PathSubEnable" "Search subfolders") #load
-		casc_cbox.Text = 						M3F_AccessINI #language \
-			(M3S_INIdata local_language "TexTool_PathCASC" "Search file from CASC") #load
-		path_list_view.Columns.Item[1].Text = 	M3F_AccessINI #language \
-			(M3S_INIdata local_language "TexTool_PathListPath" "Search Paths") #load
+		path_subfolder_cbox.Text = \
+			M3F_ReadLanguage local_language "TexTool_PathSubEnable"	"Search subfolders"
+		casc_cbox.Text = \
+			M3F_ReadLanguage local_language "TexTool_PathCASC"		"Search file from CASC"
+		path_list_view.Columns.Item[1].Text = \
+			M3F_ReadLanguage local_language "TexTool_PathListPath"	"Search Paths"
 
-		copy_cbox.Text = 						M3F_AccessINI #language \
-			(M3S_INIdata local_language "TexTool_CopyEnable" "Copy found textures to:") #load
-		copy_path_select_btn.Text = 			M3F_AccessINI #language \
-			(M3S_INIdata local_language "TexTool_CopySlt" "Select") #load
+		copy_cbox.Text = \
+			M3F_ReadLanguage local_language "TexTool_CopyEnable"	"Copy found textures to:"
+		copy_path_select_btn.Text = \
+			M3F_ReadLanguage local_language "TexTool_CopySlt"		"Select"
 
-		search_btn.Text = 						M3F_AccessINI #language \
-			(M3S_INIdata local_language "TexTool_SearchBtn" "Search") #load
-		apply_btn.Text = 						M3F_AccessINI #language \
-			(M3S_INIdata local_language "TexTool_ApplyBtn" "Apply") #load
+		search_btn.Text = \
+			M3F_ReadLanguage local_language "TexTool_SearchBtn"		"Search"
+		apply_btn.Text = \
+			M3F_ReadLanguage local_language "TexTool_ApplyBtn"		"Apply"
 	)
 
 	fn checkCASCpathList =
@@ -110,20 +110,42 @@ rollout M3P_TexToolUI "Textures Fix Tool" height:500 width:800
 			(
 				try(gc())catch()
 				local time_ = timeStamp()
-				local data_stream = MemStreamMgr.openFile "$plugcfg\\SC2DataIndex\\.SC2Index"
 
-				while(not data_stream.eos())do
+				/*
+				local data_stream = MemStreamMgr.openFile "$plugcfg\\SC2DataIndex\\.SC2Index" \
+					favor_type:#FAVOR_UTF8
+				if(data_stream != undefined)then
 				(
-					local data_path = data_stream.readLine()
-					local data_name = toLower (filenameFromPath data_path)
-					if(data_name != data_path)then
+					while(not data_stream.eos())do
 					(
-						append M3G_ImportInfo_Glb.texToolUI.CASCpathList data_name
-						append M3G_ImportInfo_Glb.texToolUI.CASCpathList data_path
+						local data_path = data_stream.readLine()
+						local data_name = toLower (filenameFromPath data_path)
+						if(data_name != data_path)then
+						(
+							append M3G_ImportInfo_Glb.texToolUI.CASCpathList data_name
+							append M3G_ImportInfo_Glb.texToolUI.CASCpathList data_path
+						)
 					)
+					MemStreamMgr.close data_stream
 				)
-				MemStreamMgr.close data_stream
-				
+				--*/
+
+				local data_stream = openFile "$plugcfg\\SC2DataIndex\\.SC2Index" mode:"rt"
+				if(data_stream != undefined)then
+				(
+					while(not (eof data_stream))do
+					(
+						local data_path = readLine data_stream
+						local data_name = toLower (filenameFromPath data_path)
+						if(data_name != data_path)then
+						(
+							append M3G_ImportInfo_Glb.texToolUI.CASCpathList data_name
+							append M3G_ImportInfo_Glb.texToolUI.CASCpathList data_path
+						)
+					)
+					close data_stream
+				)
+
 				format "readIndex: % ms\n" (timestamp()-time_)
 			)
 		)
@@ -344,40 +366,79 @@ rollout M3P_TexToolUI "Textures Fix Tool" height:500 width:800
 		ret_list
 	)
 
-	fn getBitmapName idx_FP =
+	fn getSC2MatList =
+	(
+		local i, n
+		local mat_list = #()
+		local mat_list_check = #()
+		for i in sceneMaterials do(appendIfUnique mat_list_check i)
+		for i in meditMaterials do(appendIfUnique mat_list_check i)
+		for i in objects where classOf i == SC2LensFlare do(appendIfUnique mat_list_check i.lensFlareMaterial)
+
+		for i in mat_list_check do
+		(
+			case (classOf i) of
+			(
+				SC2_Standard_Material: appendIfUnique mat_list i
+				SC2_Composite_Material:
+				(
+					for n in i.SubMaterials where n != undefined do(appendIfUnique mat_list n)
+				)
+				SC2_Displacement_Material: appendIfUnique mat_list i
+				SC2_Terrain_Material: appendIfUnique mat_list i
+				SC2_Volume_Material: appendIfUnique mat_list i
+				SC2_Creep_Material: appendIfUnique mat_list i
+				SC2_Volume_Noise_Material: appendIfUnique mat_list i
+				SC2_SplatTerrainBake_Material: appendIfUnique mat_list i
+				SC2_Reflection_Material: appendIfUnique mat_list i
+				SC2_Lens_Flare_Material: appendIfUnique mat_list i
+			)
+		)
+		mat_list
+	)
+
+	fn getBitmapName mat_FP =
 	(
 		local bitmap_name = #()
-		case (classOf meditMaterials[idx_FP]) of
+		case (classOf mat_FP) of
 		(
 			SC2_Standard_Material:
 			(
-				local bitmap_name = #(#Diffuse, #Decal, #Gloss, #Emissive1, #Emissive2, #Environment, \
+				bitmap_name = #(#Diffuse, #Decal, #Gloss, #Emissive1, #Emissive2, #Environment, \
 					#EnvironmentMask, #AlphaMask, #NormalMap, #Heightmap, #Lightmap, #AmbientOcclusion, \
-					#AlphaMask2, #GlossExp)
+					#AlphaMask2, #GlossExp, #NormBlendMask1, #NormBlendMask2, #NormBlendNormal1, #NormBlendNormal2)
 			)
 			SC2_Displacement_Material:
 			(
-				local bitmap_name = #(#Displacement, #DisplacementStrengthTexture)
+				bitmap_name = #(#Displacement, #DisplacementStrengthTexture)
 			)
 			SC2_Terrain_Material:
 			(
-				local bitmap_name = #(#TerrainMaterial)
+				bitmap_name = #(#TerrainMaterial)
 			)
 			SC2_Volume_Material:
 			(
-				local bitmap_name = #(#ColorMap, #Noisy1, #Noisy2)
+				bitmap_name = #(#ColorMap, #Noisy1, #Noisy2)
 			)
 			SC2_Creep_Material:
 			(
-				local bitmap_name = #(#CreepMaterial)
+				bitmap_name = #(#CreepMaterial)
 			)
 			SC2_Volume_Noise_Material:
 			(
-				local bitmap_name = #(#ColorMap, #VolumeNoise1, #VolumeNoise2)
+				bitmap_name = #(#ColorMap, #VolumeNoise1, #VolumeNoise2)
 			)
 			SC2_SplatTerrainBake_Material:
 			(
-				local bitmap_name = #(#DiffuseTexture, #NormalTexture, #SpecularTexture)
+				bitmap_name = #(#DiffuseTexture, #NormalTexture, #SpecularTexture)
+			)
+			SC2_Reflection_Material:
+			(
+				bitmap_name = #(#Strength_Map, #Normal_Map, #Blur_Mask_Map)
+			)
+			SC2_Lens_Flare_Material:
+			(
+				bitmap_name = #(#Normal_Map, #Dirty_Lens)
 			)
 		)
 		bitmap_name
@@ -385,19 +446,21 @@ rollout M3P_TexToolUI "Textures Fix Tool" height:500 width:800
 
 	fn texListRefresh source_FP =
 	(
-		local i, n
+		local i, n, k
 		local tex_list = #()
 		local netClass = M3S_DotNetClass()
 
 		if(source_FP == 1)then
 		(
-			for i=1 to 24 do
-			(
-				local bitmap_name = getBitmapName i
+			local mat_list = getSC2MatList()
 
-				for n in bitmap_name do
+			for n in mat_list do
+			(
+				local bitmap_name = getBitmapName n
+
+				for k in bitmap_name do
 				(
-					local file_str = try((getProperty meditMaterials[i] n).FileName)catch("")
+					local file_str = try((getProperty n k).FileName)catch("")
 					if(file_str.count > 0)then
 					(
 						appendIfUnique tex_list file_str
@@ -871,6 +934,8 @@ rollout M3P_TexToolUI "Textures Fix Tool" height:500 width:800
 		local netClass = M3S_DotNetClass()
 
 		CreateDialog M3P_TexToolWaitUI style:#(#style_border) lockHeight:true lockWidth:true
+		
+		local mat_list = getSC2MatList()
 		for i=0 to (tex_list_view.Items.Count-1) do
 		(
 			if(tex_list_view.Items.Item[i].Checked)then
@@ -891,19 +956,20 @@ rollout M3P_TexToolUI "Textures Fix Tool" height:500 width:800
 				(
 					local full_file_path = tex_list_view.Items.Item[i].SubItems.Item[2].Text + \
 						tex_list_view.Items.Item[i].SubItems.Item[1].Text
-					for n=1 to 24 do
+					
+					for n in mat_list do
 					(
 						local bitmap_name = getBitmapName n
 
 						for k in bitmap_name do
 						(
-							local file_str = try((getProperty meditMaterials[n] k).FileName)catch("")
+							local bitmap_obj = getProperty n k
+							local file_str = try(bitmap_obj.FileName)catch("")
 							if(file_str.count > 0)then
 							(
 								local file_name = filenameFromPath file_str
 								if(file_name == tex_list_view.Items.Item[i].SubItems.Item[1].Text)then
 								(
-									local bitmap_obj = getProperty meditMaterials[n] k
 									bitmap_obj.FileName = full_file_path
 								)
 							)
@@ -944,9 +1010,7 @@ rollout M3P_TexToolUI "Textures Fix Tool" height:500 width:800
 	fn pathListDragOver sender_FP e_FP =
 	(
 		local netClass = M3S_DotNetClass()
-		local point_screen = netClass.createObject #Point
-		point_screen.X = e_FP.X
-		point_screen.Y = e_FP.Y
+		local point_screen = netClass.createObject #Point d1:e_FP.X d2:e_FP.Y
 
 		local point_client = sender_FP.PointToClient point_screen
 		local index = sender_FP.InsertionMark.NearestIndex point_client
@@ -1039,13 +1103,17 @@ rollout M3P_TexToolUI "Textures Fix Tool" height:500 width:800
 	fn texToolUIinit =
 	(
 		local netClass = M3S_DotNetClass()
-		local icon_path1 = #( \
-			(symbolicPaths.expandFileName "$Temp\\M3Import_mzp\\Icons\\Check1.bmp"), \
-			(symbolicPaths.expandFileName "$Temp\\M3Import_mzp\\Icons\\Check2.bmp"))
-		local icon_path2 = #( \
-			(symbolicPaths.expandFileName "$Temp\\M3Import_mzp\\Icons\\Refresh.png"), \
-			(symbolicPaths.expandFileName "$Temp\\M3Import_mzp\\Icons\\Add.png"), \
-			(symbolicPaths.expandFileName "$Temp\\M3Import_mzp\\Icons\\Delete.png"))
+		local icon_path1 = \
+		#(
+			(symbolicPaths.expandFileName "$Temp\\M3Import_mzp\\Icons\\Check1.bmp"),
+			(symbolicPaths.expandFileName "$Temp\\M3Import_mzp\\Icons\\Check2.bmp")
+		)
+		local icon_path2 = \
+		#(
+			(symbolicPaths.expandFileName "$Temp\\M3Import_mzp\\Icons\\Refresh.png"),
+			(symbolicPaths.expandFileName "$Temp\\M3Import_mzp\\Icons\\Add.png"),
+			(symbolicPaths.expandFileName "$Temp\\M3Import_mzp\\Icons\\Delete.png")
+		)
 
 		split_container = netClass.createCtl #SplitContainer a:#Dock v:"Fill" w:panel_container.Width
 		split_container.SplitterDistance = Splitter_dis
@@ -1157,12 +1225,14 @@ rollout M3P_TexToolUI "Textures Fix Tool" height:500 width:800
 		dotnet.addeventhandler tex_btn "Click" texRefreshBtn
 		tex_group.Controls.Add tex_btn
 
-		source_radio_btn1 = netClass.createCtl #RadioButton n:"source_radio_btn1" x:60 y:20 w:125 h:16 t:"Textures from scene"
+		source_radio_btn1 = netClass.createCtl \
+			#RadioButton n:"source_radio_btn1" x:60 y:20 w:125 h:16 t:"Textures from scene"
 		source_radio_btn1.Checked = true
 		dotnet.addeventhandler source_radio_btn1 "CheckedChanged" texSourceRBtnSelect
 		tex_group.Controls.Add source_radio_btn1
 
-		source_radio_btn2 = netClass.createCtl #RadioButton n:"source_radio_btn2" x:60 y:40 w:115 h:16 t:"Textures from file"
+		source_radio_btn2 = netClass.createCtl \
+			#RadioButton n:"source_radio_btn2" x:60 y:40 w:115 h:16 t:"Textures from file"
 		dotnet.addeventhandler source_radio_btn2 "CheckedChanged" texSourceRBtnSelect
 		tex_group.Controls.Add source_radio_btn2
 
@@ -1423,3 +1493,4 @@ struct M3S_TexturesFixTool
 	)
 )
 M3G_ImportInfo_Glb.texToolUI = M3S_TexturesFixTool()
+---End Script--------------------------------------------------
