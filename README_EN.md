@@ -2,7 +2,7 @@
 M3 files Import Tools Usage Instructions
 --------------------------------------------------------------------------------------
 **M3 files Import Tools** is the M3 model file import plug-in for 3dsMax, which can import StarCraft 2 related models for editing and modifying in 3dsMax.
-## Thanks
+## Special Thanks
 Special thanks to:<br>
 Taylor Mouse:　The M3 file's data structure is based on his script.<br>
 Delphinium:　　Provide help on 3dsMax usage.<br>
