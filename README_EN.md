@@ -231,90 +231,90 @@ werd:　　　　　Helped me tested the script.
 >>
 >> 　　 Yellow is the found map path or the path to be copied to but not actually applied to
 >>
->> #### 4 -> `此贴图是否加入路径搜索`
->> #### 5 -> `刷新贴图路径`
->> 　　 重新从来源读取贴图数据
+>> #### 4 -> `Does this map join the path search`
+>> #### 5 -> `Refresh texture path`
+>> 　　 Reread texture data from source
 >>
->> *    注意，不管贴图列表的条目前面是否勾选，刷新按钮都会更新**整个列表**！
->> #### 6 -> `贴图数据来源`
->> #### 7 -> `是否使用文件的路径来解释(RootPath)字符串`
->> #### 8 -> `读取的完整文件路径`
->> #### 9 -> `指定根路径`
->> 　　 是否使用根路径解释(RootPath)字符串，并且 **`使用文件路径`** 会覆盖此项的设置
+>> *    Note that the refresh button will update the **entire list** regardless of whether the item in the map list is checked!
+>> #### 6 -> `Map Data Sources`
+>> #### 7 -> `Do you use the path of the file to interpret the (RootPath) string`
+>> #### 8 -> `Read the full file path`
+>> #### 9 -> `Specify the root path`
+>> 　　 Whether to use the root path to interpret (RootPath) strings, and **`use file path`** will override this item's settings
 >>
->> #### 10 -> `添加搜索路径`  `删除搜索路径`  `搜索路径默认化`
->> 　　 **`添加搜索路径`** 如果启用根路径模式下，任何添加的路径都会尝试解释为 **`(RootPath)\*`** 的形式
+>> #### 10 -> `Add search path`  `Delete search path`  `Search path defaults`
+>> 　　 **`Add search path`** If root path mode is enabled, any added path will try to be interpreted as **`(RootPath)\*`**
 >>
->> 　　 **`删除搜索路径`** 删除任何未在前面勾选的条目。如示例中的第3条
+>> 　　 **`Delete search path`** Delete any entries that are not checked in front. Article 3 as in the example
 >>
->> 　　 **`搜索路径默认化`** 删除所有已经存在的路径，并添加示例中的3条路径
+>> 　　 **`Search path defaults`** Delete all existing paths and add 3 paths in the example
 >>
->> #### 11 -> `是否搜索子文件夹`
->> 　　 在搜索路径时，是否将搜索路径列表中路径的存在子路径一并搜索。如示例中搜索到第2条路径时，将会提前去检索第3条路径(如果路径存在)，并跳过搜索第3条路径
+>> #### 11 -> `Whether search for subfolders`
+>> 　　 When searching for a path, whether to search for the existence of the subpath of the path in the search path list. If the second path is found in the example, the third path will be retrieved in advance (if the path exists), and the third path will be skipped.
 >>
->> *    在文件所在路径不清楚时，建议勾选此选项
->> *    如需要准确指定贴图的路径时，建议不勾选此项，以免出现不正确的搜索顺序
->> #### 12 -> `是否自动检索游戏文件中的贴图`
->> 　　在所有指定搜索路径都未找到目标贴图时，会自动去游戏文件中检索并解压对应贴图
+>> *    It is recommended to check this option when the path of the file is not clear.
+>> *    If you need to accurately specify the path of the texture, it is recommended not to check this option to avoid incorrect search order.
+>> #### 12 -> `Whether automatically retrieve the texture in the game file`
+>> 　　When the target map is not found in all specified search paths, it will automatically retrieve and extract the corresponding map from the game file.
 >>
->> *    第一次使用此功能或 **`StarCraft2`** 游戏产生了新的更新时，会提示是否建立数据目录，如果继续，将会花费 **`1~2min`** 的时间去建立整个游戏文件的目录索引
->> *    在功能开启的情况下，每次打开 **`3dsMax`** 并且第一次使用此修复工具时，都会花费 **`3~4s`** 的时间去将目录索引读入缓存中
->> *    如果没有指定可用的搜索路径或复制到路径，此功能不会生效。即如果指定了有效的复制到路径，贴图会解压到目标路径，如果没有指定解压到路径，就会解压到搜素路径列表中第一个有效的路径
->> *    此功能检索并解压每张贴图大概花费 **`1s`** 左右的时间，如贴图数量多请耐心等待
->> #### 13 -> `搜索路径`
->> 　　 显示需要进行搜索的路径
+>> *    The first time you use this feature or the **`StarCraft2`** game has generated a new update, you will be prompted to create a data directory. If you continue, it will take **`1~2min`** time. Create a directory index of the entire game file
+>> *    With the feature turned on, each time you open **3dsMax`** and the first time you use this repair tool, it will take **3~4s`** time to read the directory index into the cache.
+>> *    This feature does not take effect if no search path is specified or copied to the path. That is, if a valid copy to path is specified, the texture is decompressed to the target path, and if no decompression is specified to the path, the first valid path in the search path list is decompressed.
+>> *    This function retrieves and decompresses each texture and takes about **`1s`**. Please wait patiently if there are too many textures.
+>> #### 13 -> `Search Path`
+>> 　　 Display the path that needs to be searched
 >>
->> *    所有路径在此工具关闭时会自动保存
->> *    路径含有(RootPath)字符串并且当前没有可用于解释的根路径时，条目会显示为红色
->> *    所有条目可以拖动排序，并且在搜索时按照从上往下的顺序进行搜索
->> #### 14 -> `是否复制贴图到指定目录`
->> 　　 将找到的贴图复制到目标路径，如果贴图是从场景材质中读取的，还会将场景材质中贴图的路径改为目标路径
+>> *    All paths are automatically saved when this tool is closed
+>> *    When the path contains a (RootPath) string and there is currently no root path available for interpretation, the entry will be displayed in red
+>> *    All items can be dragged and sorted, and searched in order from top to bottom during search
+>> #### 14 -> `Whether copy the map to the specified directory`
+>> 　　 Copy the found texture to the target path. If the texture is read from the scene material, the path of the texture in the scene material will be changed to the target path.
 >>
->> *    如果指定了有效的复制到路径，搜索路径时会首先搜索复制到路径，并且不会搜索复制到路径的子文件夹
->> #### 15 -> `语言选择`
->> #### 16 -> `执行搜索`  `执行应用`
->> 　　 按照当前参数执行搜索，使用搜索前需要更新搜索贴图列表
+>> *    If a valid copy to path is specified, the search path will first search for the copy to the path and will not search for subfolders copied to the path.
+>> #### 15 -> `Language selection`
+>> #### 16 -> `Execute search` `Execute application`
+>> 　　 Perform search according to current parameters, need to update search map list before using search
 >>
 > --------------------------------------------------------------------------------------
 ## Step by Step
-* [返回顶部](#使用)
-* **怎样修复场景里的贴图路径？**
+* [back to top](#use)
+* **How to fix the texture path in the scene?**
 
-  * **Step1 ->** 打开贴图路径修复工具，左边贴图列表会显示你当前场景里材质的贴图路径
+  * **Step1 ->** Open the texture path repair tool, the left map list will show the texture path of the material in your current scene.
   
-  * **Step2 ->** 找到贴图列表里显示为红色的条目，确保此条目 **`已勾选`** 
+  * **Step2 ->** Find the entry that appears red in the map list, make sure this entry **`checked `**
   
-  * **Step3 ->** 勾选右侧 **`根路径:`** ，点击 **`选择`** 按钮，选择一个合适路径作为贴图路径搜索的起点
+  * **Step3 ->** Check the right side **`root path:`**, click **`Select `** button, select a suitable path as the starting point for the texture path search
   
-  * **Step4 ->** **`(可选)`** 勾选 **`从CASC文件中搜索`**  **注意:** 开启此功能可能会花费一些时间用来准备必要的信息，具体见上方[图标注释](#12---是否自动检索游戏文件中的贴图)
+  * **Step4 ->** **`(optional)`** Tick **`Search from CASC file`** **Note:** Turning this feature on may take some time to prepare the necessary Information, see above [icon comment] (#12--- whether to automatically retrieve the texture in the game file)
   
-  * **Step5 ->** 点击 **`+`** 按钮选择并添加要进行搜索的路径，确保添加的路径条目 **`已勾选`** 
+  * **Step5 ->** Click the **`+`** button to select and add the path to search for, make sure the added path entry **`checked `**
   
-  * **Step6 ->** **`(可选)`** 勾选下方 **`复制找到的贴图到:`** ，点击选择按钮，选择一个合适的路径作为贴图存放的路径
+  * **Step6 ->** **`(optional)`** Tick below **`Copy the found map to: `**, click the Select button and select a suitable path as the path to the map
   
-  * **Step7 ->** 点击 **`搜索`** 按钮，开始搜索贴图路径并等待完成
+  * **Step7 ->** Click the **`Search`** button to start searching the texture path and wait for completion
   
-  * **Step8 ->** 点击 **`应用`** 按钮，将左侧黄色条目的 **`新路径值`** ，应用到场景材质中
+  * **Step8 ->** Click the **`Apply`** button to apply the **`new path value`** of the yellow entry on the left to the scene material
   ______________________________________________________________________________________________
-* **怎样自动寻找或解压外部m3文件的贴图到指定路径？**
+* **How to automatically find or extract the texture of the external m3 file to the specified path?**
 
-  * **Step1 ->** 打开贴图路径修复工具，选择右侧 **`从文件读取`** 单选框
+  * **Step1 ->** Open the texture path repair tool and select the right side **`Read from file`** radio button
   
-  * **Step2 ->** 点击选择按钮，选择需要寻找的 **`m3文件`** ，并点击刷新按钮，刷新左侧贴图列表
+  * **Step2 ->** Click the Select button, select the **`m3 file`** you need to find, and click the Refresh button to refresh the left map list.
   
-  * **Step3 ->** 找到贴图列表里显示为红色的条目，确保此条目 **`已勾选`** 
+  * **Step3 ->** Find the entry that appears red in the map list, make sure this entry **`checked `**
   
-  * **Step4 ->**  **`(二选一)`** 勾选右侧 **`根路径:`** ，点击 **`选择`** 按钮，选择一个合适路径作为贴图路径搜索的起点
+  * **Step4 ->**  **` (choose one) `** Tick the right **`root path:`**, click the **`Select`** button to select a suitable path as the texture path Starting point of search
   
-  * **Step5 ->**  **`(二选一)`** 勾选上方 **`(根路径使用文件路径)`** ，使用 **`m3文件`** 的路径作为 **`根路径`** 的路径
+  * **Step5 ->**  **` (two choices one) `** Check the above **` (root path using file path) `**, use the path of **`m3 file `** as ** Path to `root path`**
   
-  * **Step6 ->**  **`(可选)`** 勾选 **`从CASC文件中搜索`**  **注意:** 开启此功能可能会花费一些时间用来准备必要的信息，具体见上方[图标注释](#12---是否自动检索游戏文件中的贴图)
+  * **Step6 ->**  **`(optional)`** Tick **`Search from CASC file`** **Note: ** Turning this feature on may take some time to prepare the necessary Information, see above [icon comment] (#12--- whether to automatically retrieve the texture in the game file)
   
-  * **Step7 ->** 点击 **`+`** 按钮选择并添加要进行搜索的路径，确保添加的路径条目 **`已勾选`** 
+  * **Step7 ->** Click the **`+`** button to select and add the path to search for, make sure the added path entry **`checked `**
   
-  * **Step8 ->**  **`(可选)`** 勾选下方 **`复制找到的贴图到:`** ，点击选择按钮，选择一个合适的路径作为贴图存放的路径
+  * **Step8 ->** **`(optional)`** Tick the following **`Copy the found map to: `**, click the Select button and select a suitable path as the path to the map.
   
-  * **Step9 ->** 点击 **`搜索`** 按钮，开始搜索贴图路径并等待完成
+  * **Step9 ->** Click the **`Search`** button to start searching the texture path and wait for completion
   
-  * **Step10 ->** 点击 **`应用`** 按钮，将左侧黄色条目对应的贴图复制或解压到对应的 **`新路径值`** 的位置
+  * **Step10 ->** Click the **`Apply` button to copy or unzip the texture corresponding to the yellow entry on the left to the corresponding **`new path value`**
   ______________________________________________________________________________________________
