@@ -1,6 +1,7 @@
 # M3_Import
 M3 files Import Tools 使用说明
 --------------------------------------------------------------------------------------
+[English Version](https://github.com/CaptainD001/M3_Import/blob/master/README_EN.md)
 **M3 files Import Tools** 是适用于 3dsMax 的一款m3模型文件导入插件，可以导入StarCraft2的相关模型到 3dsMax 中进行编辑修改。
 ## 下载
 * 插件本体下载：[跳转下载页面](https://github.com/CaptainD001/M3_Import/releases)
