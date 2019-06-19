@@ -1,229 +1,235 @@
 # M3_Import
-M3 files Import Tools 使用说明
+M3 files Import Tools Usage Instructions
 --------------------------------------------------------------------------------------
-**M3 files Import Tools** 是适用于 3dsMax 的一款m3模型文件导入插件，可以导入StarCraft2的相关模型到 3dsMax 中进行编辑修改。
-## 下载
-* 插件本体下载：[跳转下载页面](https://github.com/CaptainD001/M3_Import/releases)
-*  **`SC2StarArtTools for Max2016`** 下载：[跳转下载页面](https://github.com/CaptainD001/M3_Import/tree/SC2ArtTools)
-## 使用注意
-* 本插件v1.7a及以上版本和 **`SC2StarArtTools for Max2016`** 均支持 **3dsMax 2016 x64** 版本。
-* 本插件v1.7及以下版本和 **`SC2StarArtTools for Max2011`** 都只支持 **3dsMax 2011 x64**，其余版本的 3dsMax 无法使用。
-* 路径及文件名请全部使用英文，中文会引起运行错误。
-## 安装/卸载/更新
-* #### 安装
-  * 需要提前安装 **`SC2StarArtTools`**
-  * 复制 **`CaptainD-M3Import-vXX.mzp`** 脚本文件到 **`你Max的安装目录/Scripts/Startup`**
-  * 启动 3dsMax，工具栏会在最右边自动添加导入插件的按钮
-* #### 卸载
-  * 删除 **`CaptainD-M3Import-vXX.mzp`** 重启 3dsmax 即可
+**M3 files Import Tools** is the M3 model file import plug-in for 3dsMax, which can import StarCraft 2 related models for editing and modifying in 3dsMax.
+## Thanks
+Special thanks to:<br>
+Taylor Mouse:　The M3 file's data structure is based on his script.<br>
+Delphinium:　　Provide help on 3dsMax usage.<br>
+一叶尽书繁华:　Provide the DLL library for texture path repair tool.<br>
+werd:　　　　　Helped me tested the script.
+## Download
+* Plug-in Download: [Jump Download Page](https://github.com/CaptainD001/M3_Import/releases)
+*  **`SC2StarArtTools for Max2016`** Download：[Jump Download Page](https://github.com/CaptainD001/M3_Import/tree/SC2ArtTools)
+## Use Attention
+* Versions v1.7a and above and **`SC2StarArtTools for Max2016`** support **3dsMax 2016 x64** .
+* Versions V1.7 and below and **`SC2StarArtTools for Max2011`** only support **3dsMax 2011 x64**, the rest of the 3dsMax is not available.
+* All paths and file names should be in English.
+## Installation/Unloading/Updating
+* #### Installation
+  * Need to install **`SC2StarArtTools`** first
+  * Copy the **`CaptainD-M3Import-vXX.mzp`** script file to **`your Max installation directory/Scripts/Startup`**
+  * Start 3dsMax, and the toolbar will automatically add the plug-in buttons on the right
+* #### Unloading
+  * Delete **`CaptainD-M3Import-vXX.mzp`** and restart 3dsmax
 
-* #### 更新
-  * 删除旧版本 **`CaptainD-M3Import-vXX.mzp`** 脚本文件
-  * 复制新版本 **`CaptainD-M3Import-vXX.mzp`** 脚本文件到同目录
+* #### Update
+  * Delete the old version of **`CaptainD-M3Import-vXX.mzp`** script file
+  * Copy the new version of **`CaptainD-M3Import-vXX.mzp`** script file to the same directory
 
-## 使用
-![界面预览](https://github.com/CaptainD001/M3_Import/blob/image/M3Import_0.png)
-* 打开 3dsMax 后，会自动加载脚本，并在上方工具栏显示(从左到右: `SC2StarArtTools` `CaptainD-M3Import`)
-* [**模型导入工具**]
-  * [界面说明](#主界面)
-  * [常见问题](#qa)
-  * 打开模型导入工具后，点击 **`选择文件`** ，选择需要导入的文件，然后点击 **`导入`** 按钮，即可导入m3模型
-  * 导入过程可能花费 30s~2min，导入期间 3dsMax 界面可能出现闪烁或未响应的情况，属于正常情况，请耐心等待
-  * 如果导入出现错误提示，请向本人留言(18321277220@163.com)并告知导致导入错误的模型，我会尽快定位问题并修复脚本
-* [**贴图路径修复工具**]
-  * [界面说明](#贴图路径修复工具界面)
-  * [使用指导](#step-by-step)
-  * 可以修复场景材质贴图路径不正确的问题，也可以从游戏文件中自动解压必要贴图，具体使用方法见下方界面预览及其说明
-  * 特别感谢一叶尽书繁华提供的CASC解压DLL库的支持
+## Use
+![Interface preview](https://github.com/CaptainD001/M3_Import/blob/image/M3Import_0.png)
+* When 3dsMax is opened, the script is automatically loaded and displayed in the upper toolbar (from left to right: `SC2StarArtTools'`CaptainD-M3Import')
+* [**Model Import Tool**]
+  * [Interface Description](#MainInterface)
+  * [FAQ](#qa)
+  * After opening the model import tool, click **`Select File`**, select the file you want to import, and then click the **`import`** button to import the m3 model.
+  * The import process may take 30s~2min. During the import, the 3dsMax interface may flash or not respond. This is normal. Please be patient.
+  * If the importer display error messages, please leave a message to me (18321277220@163.com) and inform the model that caused the import error, I will locate the problem and fix the script as soon as possible.
+* [**Map Path Repair Tool**]
+  * [Interface Description](#MapPathRepairToolInterface)
+  * [Guide to use](#step-by-step)
+  * It can fix the problem that the scene texture map path is incorrect. You can also extract the necessary map automatically from the game file. For details, see the interface preview and its description.
+  * Special thanks to the support of the CASC decompression DLL library provided by 一叶尽书繁华.
 --------------------------------------------------------------------------------------
-## 界面说明
-* #### 主界面：
-[返回顶部](#使用)
-> ![界面预览](https://github.com/CaptainD001/M3_Import/blob/image/M3Import_1.png)    ![界面预览](https://github.com/CaptainD001/M3_Import/blob/image/M3Import_2.png)    ![界面预览](https://github.com/CaptainD001/M3_Import/blob/image/M3Import_3.png)
-> ### 图标注释
->> #### 1 -> `默认化所有导入参数`
->> 　　 点击此按钮后所有导入参数会重置为默认的状态
+## Interface Description
+* #### Main interface:
+[back to top](#use)
+> ![Interface Preview](https://github.com/CaptainD001/M3_Import/blob/image/M3Import_1.png)    ![Interface Preview](https://github.com/CaptainD001/M3_Import/blob/image/M3Import_2.png)    ![Interface Preview](https://github.com/CaptainD001/M3_Import/blob/image/M3Import_3.png)
+> ### Icon Comments
+>> #### 1 -> `Default all import parameters`
+>> 　　 All import parameters will be reset to the default state after clicking this button
 >>
->> #### 2 -> `语言选择`
->> #### 3 -> `关于`
+>> #### 2 -> `Language selection`
+>> #### 3 -> `About`
 > ### Import Settings
->> #### 1 -> `导入路径及文件名显示`
->> #### 2 -> `选择导入文件按钮`
->> #### 3 -> `执行导入按钮`
->> #### 4 -> `导入进度及阶段显示`
->> #### 5 -> `是否记录并显示导入的详细信息`
->> 　　 如果此项被勾选，在开始导入时会自动打开 **`导入信息窗口`** ，并记录所有导入过程产生的提示信息
+>> #### 1 -> `Import path and file name display`
+>> #### 2 -> `Select import file button`
+>> #### 3 -> `Execute the import button`
+>> #### 4 -> `Import progress and stage display`
+>> #### 5 -> `Whether to record and display the details of the import`
+>> 　　 If this item is checked, **`import information window`** will be opened automatically when importing, and all prompts generated during the import process will be recorded.
 >>
->> #### 6 -> `是否在导入后弹出窗口提示缺失贴图`
->> #### 7 -> `导入信息窗口显示/关闭按钮`
->> #### 8 -> `默认自定义贴图搜索路径显示`
->> *    只有在贴图路径选择 **`User Select`** 时，此处显示的路径才会生效
->> #### 9 -> `贴图路径选择列表`
->> 　　 选择导入时材质贴图路径自动寻找的目录，可选择: **`m3文件根目录`** **`m3文件根目录\Textures`** **`m3文件根目录\Assets\Textures`** **`User Select`**
+>> #### 6 -> `Whether the pop-up window prompts missing map after importing`
+>> #### 7 -> `Import information window display/close button`
+>> #### 8 -> `Default custom texture search path display`
+>> *    The path shown here will only take effect if the texture path is selected **`User Select`**
+>> #### 9 -> `Map Path Selection List`
+>> 　　 Select the directory where the texture map path is automatically found when importing. You can choose: **`m3 file root directory`** **`m3 file root directory\Textures`** **`m3 file root directory\Assets\Textures` ** **`User Select`**
 >>
->> #### 10 -> `选择自定义贴图搜索路径`
->> #### 其他 -> `各模块导入开关`
->> 　　 选项为相应模块内容导入开关，默认开启
+>> #### 10 -> `Select custom texture search path`
+>> #### Other -> `Each module import switch`
+>> 　　 The option is the corresponding module content import switch, which is enabled by default.
 >>
 > ### Advance Settings
->> #### 全局
->> *    **`位置偏移`**
+>> #### Global
+>> *    **`location offset`**
 >>
->> 　　 决定导入后模型出现的位置
+>> 　　 Decide where the model will appear after import
 >>
->> *    **`缩放`**
+>> *    **`zoom`**
 >>
->> 　　 决定导入后模型的大小。注意，改变的大小不是通过轴缩放改变的，所以有可能出现失真的情况，遇到上述情况请将参数值设置为1.0
+>> 　　 Determine the size of the model after import. Note that the size of the change is not changed by the axis scaling, so there may be distortion. In the above case, set the parameter value to 1.0.
 >>
->> #### 动画
->> *    **`动画帧率`**
+>> #### Animation
+>> *    **`Animation frame rate`**
 >>
->> 　　 决定导入后动画的播放速率，一般模型的默认速率为30帧
+>> 　　 Determine the playback rate of the animation after import, the default rate of the general model is 30 frames
 >>
->> *    **`序列间帧数`**
+>> *    **`Interframe number of frames`**
 >>
->> 　　 动画序列间的间隔帧数，最小为10帧
+>> 　　 The number of interval frames between animation sequences, the minimum is 10 frames
 >>
->> *    **`帧缩放修正`**
+>> *    **`Frame Scale Correction`**
 >>
->> 　　 动画导入后出现忽快忽慢的失真时，可适量放大此值，会删除时间不均匀的关键帧。一般在更改了默认帧率时会需要调整此项参数
+>> 　　 When there is a sudden and slow distortion after the animation is imported, the value can be enlarged by an appropriate amount, and the key frames with uneven time will be deleted. This parameter will usually need to be adjusted when the default frame rate is changed.
 >>
->> *    **`帧缩放修正范围`**
+>> *    **`Frame Scale Correction Range`**
 >>
->> 　　 决定帧缩放修正删除失真动画帧的范围。如果动画忽快忽慢的情况没有得到解决可以适当调高此值，但也会失去更多的关键帧
+>> 　　 Determine frame zoom correction to remove the range of distorted animation frames. If the animation is slow or slow, you can raise this value appropriately, but you will lose more keyframes.
 >>
->> #### 网格
->> *    **`导入选项`**
+>> #### Mesh
+>> *    **`Import option`**
 >>
->> 　　 设置导入时对网格进行的优化操作。可选择: `原生导入` `焊接&平滑` `什么都不做` `只焊接` `只平滑`
+>> 　　 Set the optimization of the mesh when importing. Optional: `Origin import` `welding & smoothing` `do nothing` `only Welding` `only smoothing`
 >>
->> 　　 `原生导入` 可以读取出m3文件里网格模型的实际焊接情况和平滑组设置，但会耗费大量时间计算并还原数据
+>> 　　 `Origin Import` can read the actual welding situation and smoothing group settings of the mesh model in the m3 file, but it will take a lot of time to calculate and restore the data.
 >>
->> 　　 `焊接&平滑` 按照0.001阈值焊接顶点，并按照选择的平滑方式平滑网格模型
+>> 　　 `Welding & Smoothing` Weld vertices according to the 0.001 threshold and smooth the mesh model according to the selected smoothing method
 >>
->> 　　 `什么都不做` 不进行任何操作，如果导入时耗费大量时间，可以选择此项减少导入耗时
+>> 　　 `Do Nothing` Do not do anything. If it takes a lot of time to import, you can choose this to reduce the import time.
 >>
->> 　　 `只焊接` 按照0.001阈值焊接顶点
+>> 　　 `Only Welding` welds the apex according to the 0.001 threshold
 >>
->> 　　 `只平滑` 按照选择的平滑方式平滑网格模型
+>> 　　 `Only Smoothing` Smooth mesh model according to the selected smoothing method
 >>
->> *    **`按角度平滑`**
+>> *    **`Smooth by angle`**
 >>
->> 　　 按照设置的角度值自动平滑网格模型
+>> 　　 Automatically smooth the mesh model according to the set angle value
 >>
->> *    **`按UV平滑`**
+>> *    **`Smooth by UV`**
 >>
->> 　　 按照网格模型 UVmapping 的划分方式分配平滑组
+>> 　　 Assign smoothing groups according to the mesh model UVmapping
 >>
->> #### 骨骼
->> *    **`骨骼类型`**
+>> #### Bone
+>> *    **`Bone Type`**
 >>
->> 　　 选择导入的骨骼使用的类型，下方设置各类型的大小。可选择: `标准骨骼` `辅助体` `长方体` `四棱锥` `无实体`
+>> 　　 Select the type of bone used for import, and set the size of each type below. Optional: `OriginBone` `Dummy` `Box` `Pyramid` `No Entity`
 >>
->> 　　 `标准骨骼` 使用正常的骨骼对象
+>> 　　 `OriginBone` use normal bone objects
 >>
->> 　　 `辅助体` 使用 Dummy 对象。在未使用 **`修正骨骼方向`** 选项时也会修正朝向，但此时修改的是显示方向，实际轴并未修改。
+>> 　　 `Dummy` Use a Dummy object. The orientation is also corrected when the **`Fix Bone Orientation`** option is not used, but the display orientation is modified and the actual axis is not modified.
 >>
->> 　　 `长方体` 使用 Box 对象。在未使用 **`修正骨骼方向`** 选项时也会修正朝向，但此时修改的是显示方向，实际轴并未修改。
+>> 　　 `Box` Use the Box object. The orientation is also corrected when the **`Fix Bone Orientation`** option is not used, but the display orientation is modified and the actual axis is not modified.
 >>
->> 　　 `四棱锥` 使用四棱锥对象，此类型比较像一般的骨骼对象。在未使用 **`修正骨骼方向`** 选项时也会修正朝向，但此时修改的是显示方向，实际轴并未修改。
+>> 　　 `Pyramid` Use the pyramid objects, this type is more like a normal bone object. The orientation is also corrected when the **`Fix Bone Orientation`** option is not used, but the display orientation is modified and the actual axis is not modified.
 >>
->> 　　 `无实体` 不会显示任何实体，强制显示骨骼的链接。 **`修正骨骼方向`** 选项对此类型无效。
+>> 　　 `No Entity` does not display any entities, forcing links to bones. The **`Fix Bone Orientation`** option has no effect on this type.
 >>
->> *    **`导入动画`**
+>> *    **`Import Animation`**
 >>
->> 　　 决定是否导入所有骨骼的轴动画，关闭此项不会影响参数动画。
+>> 　　 Decide whether to import axis animations for all bones. Turning off this item does not affect parameter animation.
 >>
->> *    **`显示链接`**
+>> *    **`Show Link`**
 >>
->> 　　 是否显示骨骼的链接
+>> 　　 Whether to display links to bones
 >>
->> *    **`修正骨骼方向`**
+>> *    **`Fix Bone Orientation`**
 >>
->> 　　 勾选此项时，会按照父级指向子级的方向尽可能的修改骨骼朝向，勾选此项会修改实际轴朝向，如果骨骼存在非等比缩放时，直接修改轴朝向会造成出现非正交坐标轴，3dsMax不能直接修改非正交坐标轴，编辑或导出时会造成动画失真，所以出现此问题时会额外创建一个 Dummy 父对象用来保存原来的轴数据
+>> 　　 When this item is checked, the orientation of the bone will be modified as much as possible according to the direction of the parent pointing to the child. Checking this item will modify the actual axis orientation. If the bone has non-proportional scaling, directly modifying the orientation of the axis will cause the appearance. Non-orthogonal axes, 3dsMax can't directly modify non-orthogonal axes. When editing or exporting, it will cause animation distortion, so when this problem occurs, an additional Dummy parent object will be created to save the original axis data.
 >>
->> *    **`指定控制器`**
+>> *    **`Specify controller`**
 >>
->> 　　 指定骨骼使用的 移动/旋转/缩放 的控制器。
+>> 　　 Specifies the controller for the translation/rotation/scale used by the bone.
 >>
->> #### 辅助对象
->> *    **`附着点大小`**
+>> #### Helper
+>> *    **`attachment point size`**
 >>
->> 　　 附着点显示的大小，不会影响实际缩放大小
+>> 　　 The size of the attachment point display does not affect the actual scale size
 >>
->> *    **`附着点使用缩放`**
+>> *    **`The attachment point uses scale`**
 >>
->> 　　 决定是否导入附着点的缩放数据。一般来说m3模型的附着点没有直接的缩放数据，但是实际m3文件内存储有冗余的缩放数据，并且附着点的缩放数据可以被正确识别导出。
+>> 　　 Decide whether to import the scaling data of the attachment point. Generally, the attachment point of the m3 model has no direct scaling data, but the actual m3 file stores redundant scaling data, and the scaling data of the attachment point can be correctly identified and derived.
 >>
->> *    **`隐藏包围球`**
+>> *    **`Hide the encircled ball`**
 >>
->> 　　 决定包围球是否显示为边框模式，并冻结。
+>> 　　 Determines whether the bounding ball is displayed in border mode and freezes.
 >>
->> *    **`隐藏附着点`**
+>> *    **`Hide attachment point`**
 >>
->> 　　 决定附着点是否显示为点，并冻结。
+>> 　　 Decide if the attachment point is displayed as a point and freeze.
 >>
->> *    **`隐藏体积辅助对象`**
+>> *    **`Hide volume helper object`**
 >>
->> 　　 决定体积辅助对象是否显示为边框模式，并冻结。
+>> 　　 Determines whether the volume helper object is displayed in border mode and freezes.
 >>
->> *    **`碰撞测试辅助对象`**
+>> *    **`Collision test helper object`**
 >>
->> 　　 决定碰撞测试辅助对象是否显示为边框模式，并冻结。
+>> 　　 Determines whether the collision test helper object is displayed in border mode and freezes.
 >>
->> #### 灯光
->> *    **`轴动画`**
+>> #### Light
+>> *    **`Axis Animation`**
 >>
->> 　　 决定是否导入自身的轴动画。
+>> 　　 Decide whether to import the axis animation.
 >>
->> *    **`参数动画`**
+>> *    **`parameter animation`**
 >>
->> 　　 决定是否导入自身的参数动画。
+>> 　　 Decide whether to import the parameter animation.
 >>
->> #### 相机
->> *    **`轴动画`**
+>> #### Camera
+>> *    **`Axis Animation`**
 >>
->> 　　 决定是否导入自身的轴动画。
+>> 　　 Decide whether to import the axis animation.
 >>
->> *    **`参数动画`**
+>> *    **`parameter animation`**
 >>
->> 　　 决定是否导入自身的参数动画。
+>> 　　 Decide whether to import the parameter animation.
 >>
->> #### 粒子
->> *    **`轴动画`**
+>> #### Particle
+>> *    **`Axis Animation`**
 >>
->> 　　 决定是否导入自身的轴动画。
+>> 　　 Decide whether to import the axis animation.
 >>
->> *    **`参数动画`**
+>> *    **`parameter animation`**
 >>
->> 　　 决定是否导入自身的参数动画。
+>> 　　 Decide whether to import the parameter animation.
 >>
 > --------------------------------------------------------------------------------------
 ## Q&A
-* [返回顶部](#使用)
-* **Question: 导入到一半时想取消怎么办？**
-  * **Answer ->** 打开 **`导入信息窗口`** 并点击 **`Cancel`** 按钮
-* **Question: 遇到提示错误"未知错误"怎么办？**
-  * **Answer ->** 此问题是 3dsMax 合并文件时造成的随机错误，将导入了一半的物体删除后重新导入即可。
-* **Question: 选择了贴图搜索路径依然提示找不到贴图怎么办？**
-  * **Answer ->** 请使用 **`贴图路径修复工具`** ，一般可以完全解决贴图路径的问题。
-* **Question: 网格选择"原生导入"后依然存在平滑组设置错误怎么办？**
-  * **Answer ->** 现在原生导入的算法并不能100%还原平滑组数据，遇到此问题请选择其他平滑方式。
-* **Question: 模型导入后骨骼方向混乱怎么办？**
-  * **Answer ->** 使用标准骨骼时，请勾选 **`修正骨骼方向`** 选项，或直接使用其他类型的骨骼实体。
-* **Question: 有些动画骨骼的旋转出现抖动怎么办？**
-  * **Answer ->** 因为m3模型记录旋转信息使用的是Quat四元数的形式，在转换到易于编辑的欧拉坐标时会出现多解的情况，如果出现此问题请尝试更换骨骼的 **`旋转控制器`** ，如果问题未解决，请根据实际动画走向手动修复。
+* [back to top](#use)
+* **Question: What do I want to cancel when I import it in half?**
+  * **Answer ->** Open **`Import Info Window`** and click the **`Cancel`** button
+* **Question: What should I do if I get a prompt error "Unknown error"?**
+  * **Answer ->** This problem is a random error caused by 3dsMax merging files. After importing half of the imported objects, re-import them.
+* **Question: What if I choose the texture search path and still can't find the texture?**
+  * **Answer ->** Please use the **`map path repair tool`** to solve the problem of the texture path.
+* **Question: What should I do if there is still a smoothing group setting error after the grid selection "Origin Import"?**
+  * **Answer ->** Now the origin imported algorithm does not restore the smoothed group data 100%. If you encounter this problem, please choose another smoothing method.
+* **Question: What should I do if the bones are chaotic after the model is imported?**
+  * **Answer ->** When using standard bones, check the **`Fix bone orientation`** option or use other types of bone entities directly.
+* **Question: What if some of the bones' rotation animations are jittery?**
+  * **Answer ->** Because the m3 model records rotation information using the Quat quaternion form, multiple solutions occur when converting to Euler coordinates that are easy to edit. If this problem occurs, try to replace the bones. **`Rotate controller`**, if the problem is not resolved, please manually fix it according to the actual animation.
 > --------------------------------------------------------------------------------------
-* #### 贴图路径修复工具界面：
-[返回顶部](#使用)
-> ![界面预览](https://github.com/CaptainD001/M3_Import/blob/image/M3Import_4.png)
-> ### 图标注释
->> #### 1 -> `贴图列表 全选/全不选`
->> #### 2 -> `需要寻找的贴图名称`
->> #### 3 -> `找到的贴图路径`
->> 　　 红色为此路径下无对应贴图
+* #### Map Path Repair Tool Interface：
+[back to top](#use)
+> ![Interface Preview](https://github.com/CaptainD001/M3_Import/blob/image/M3Import_4.png)
+> ### Icon Comments
+>> #### 1 -> `Map list Select all/None`
+>> #### 2 -> `The name of the map you need to find`
+>> #### 3 -> `Found texture path`
+>> 　　 Red has no corresponding map for this path
 >>
->> 　　 黄色为已找到的贴图路径或准备复制到的路径但未实际应用到场景材质或已经复制贴图到目标路径
+>> 　　 Yellow is the found map path or the path to be copied to but not actually applied to
 >>
 >> #### 4 -> `此贴图是否加入路径搜索`
 >> #### 5 -> `刷新贴图路径`
