@@ -5,6 +5,12 @@ M3 files Import Tools 使用说明
 ## 下载
 * 插件本体下载：[跳转下载页面](https://github.com/CaptainD001/M3_Import/releases)
 *  **`SC2StarArtTools for Max2016`** 下载：[跳转下载页面](https://github.com/CaptainD001/M3_Import/tree/SC2ArtTools)
+## 特别感谢
+特别感谢:<br>
+Taylor Mouse:　本插件的m3数据结构参考了他制作的插件里的成果<br>
+Delphinium:　　向我提供了3dsMax使用上的建议和帮助<br>
+一叶尽书繁华:　提供了贴图路径修复工具中使用的CASC解压库DLL的支持<br>
+werd:　　　　　帮助我测试了脚本功能
 ## 使用注意
 * 本插件v1.7a及以上版本和 **`SC2StarArtTools for Max2016`** 均支持 **3dsMax 2016 x64** 版本。
 * 本插件v1.7及以下版本和 **`SC2StarArtTools for Max2011`** 都只支持 **3dsMax 2011 x64**，其余版本的 3dsMax 无法使用。
