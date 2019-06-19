@@ -31,13 +31,13 @@ werd:　　　　　Helped me tested the script.
 ![Interface preview](https://github.com/CaptainD001/M3_Import/blob/image/M3Import_0.png)
 * When 3dsMax is opened, the script is automatically loaded and displayed in the upper toolbar (from left to right: `SC2StarArtTools'`CaptainD-M3Import')
 * [**Model Import Tool**]
-  * [Interface Description](#MainInterface)
+  * [Interface Description](#main-interface)
   * [FAQ](#qa)
   * After opening the model import tool, click **`Select File`**, select the file you want to import, and then click the **`import`** button to import the m3 model.
   * The import process may take 30s~2min. During the import, the 3dsMax interface may flash or not respond. This is normal. Please be patient.
   * If the importer display error messages, please leave a message to me (18321277220@163.com) and inform the model that caused the import error, I will locate the problem and fix the script as soon as possible.
 * [**Map Path Repair Tool**]
-  * [Interface Description](#MapPathRepairToolInterface)
+  * [Interface Description](#map-path-repair-tool-interface)
   * [Guide To Use](#step-by-step)
   * It can fix the problem that the scene texture map path is incorrect. You can also extract the necessary map automatically from the game file. For details, see the interface preview and its description.
   * Special thanks to the support of the CASC decompression DLL library provided by 一叶尽书繁华.
